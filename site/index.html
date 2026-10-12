@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charte graphique Babierland City</title>
+<meta name="description" content="Charte graphique officielle de Babierland City (Babierland × Art of the New Wave) : logos, couleurs, typographies, éléments graphiques, composants web, ton et déclinaisons.">
+<meta name="theme-color" content="#D51D02">
+<meta property="og:title" content="Charte graphique · Babierland City">
+<meta property="og:description" content="Logos, couleurs, typographies, composants et déclinaisons de Babierland City · 1er janvier 2027 · Adzopé.">
+<meta property="og:image" content="assets/visuels/logo-city-fond-orange.webp">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  :root { color-scheme: light; }
+  .wrap { width: min(1200px, 100% - 32px); margin-inline: auto; }
+
+  /* ---------- Couverture ---------- */
+  .cover { position: relative; overflow: hidden; padding: 28px 0 80px; }
+  .cover__top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-weight: 700; font-size: var(--fs-sm); letter-spacing: .12em; text-transform: uppercase; }
+  .cover__top img { height: 34px; width: auto; }
+  .cover__grid { display: grid; gap: 24px; align-items: center; margin-top: 36px; }
+  .cover h1 { font-size: clamp(3.2rem, 11vw, 8.5rem); margin: 0; line-height: .9; }
+  .cover h1 span { color: var(--soleil); display: block; }
+  .cover p { font-size: var(--fs-lg); max-width: 52ch; margin: 18px 0 0; }
+  .cover__logo { width: min(480px, 90%); justify-self: center; filter: drop-shadow(0 14px 30px rgba(122,10,2,.6)); transform: rotate(-3deg); }
+  .cover__chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .cover__chips .chip { background: rgba(27,18,16,.3); border-color: rgba(255,255,255,.35); color: #fff; }
+  .cover__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .cover .btn--ghost { color: #fff; }
+  @media (min-width: 960px) { .cover__grid { grid-template-columns: 1.1fr .9fr; } }
+
+  /* ---------- Sommaire ---------- */
+  .toc { position: sticky; top: 0; z-index: var(--z-nav); background: var(--encre); border-bottom: 3px solid var(--soleil); }
+  .toc ol { display: flex; gap: 4px; overflow-x: auto; list-style: none; margin: 0; padding: 8px 16px; scrollbar-width: none; counter-reset: t; }
+  .toc ol::-webkit-scrollbar { display: none; }
+  .toc a { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; white-space: nowrap; color: var(--creme); text-decoration: none; font-weight: 600; font-size: var(--fs-sm); border-radius: var(--r-pill); transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out); }
+  .toc li { counter-increment: t; }
+  .toc a::before { content: counter(t, decimal-leading-zero); font: 400 .8rem var(--font-display); color: var(--soleil); }
+  .toc a:hover, .toc a.active { background: var(--soleil); color: var(--encre); }
+  .toc a.active::before, .toc a:hover::before { color: var(--brasier); }
+
+  /* ---------- Sections ---------- */
+  .ch { padding: 80px 0; border-bottom: 2px solid var(--border); scroll-margin-top: 60px; }
+  .ch__head { display: grid; gap: 8px; margin-bottom: 36px; }
+  .ch__num { font: 400 1rem var(--font-display); color: var(--brasier); letter-spacing: .1em; }
+  .ch h2 { font: 400 clamp(2.6rem, 7vw, 4.6rem)/1.02 var(--font-display); text-transform: uppercase; margin: 0; }
+  .ch__intro { font-size: var(--fs-lg); color: var(--text-muted); max-width: 66ch; margin: 0; }
+  h3.sub { font: 800 var(--fs-xl)/1.2 var(--font-sans); margin: 44px 0 16px; }
+  .muted { color: var(--text-muted); }
+  .grid { display: grid; gap: 16px; }
+  @media (min-width: 720px) { .g2 { grid-template-columns: repeat(2, 1fr); } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); } }
+  .panel { background: var(--surface); border: 2px solid var(--encre); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-1); }
+  .panel h4 { margin: 0 0 6px; font-size: var(--fs-lg); font-weight: 800; }
+  .panel p { margin: 0; color: var(--text-muted); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0; }
+  .kv dt { font-weight: 700; font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); padding-top: 2px; }
+  .kv dd { margin: 0; font-weight: 600; }
+  @media (max-width: 480px) { .kv { grid-template-columns: 1fr; gap: 2px; } .kv dd { margin-bottom: 10px; } }
+  .todo { display: inline-flex; align-items: center; gap: 6px; background: #FFF0B3; color: #6B4E00; border: 1.5px solid #E5C34A; padding: 2px 10px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+
+  /* ---------- Univers ---------- */
+  .words { display: flex; flex-wrap: wrap; gap: 10px; }
+  .word { font: 900 var(--fs-lg) var(--font-sans); text-transform: uppercase; padding: 10px 18px; border-radius: var(--r-pill); border: 2.5px solid var(--encre); box-shadow: var(--shadow-1); color: var(--encre); }
+  .mood { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 900px) { .mood { grid-template-columns: 1fr 1fr 1.2fr; } }
+  .mood figure { margin: 0; border: 2.5px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-2); background: var(--surface); }
+  .mood figcaption { padding: 10px 14px; font-weight: 700; font-size: var(--fs-sm); }
+  .mood img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
+  .mood .wide { grid-column: 1 / -1; }
+  @media (min-width: 900px) { .mood .wide { grid-column: auto; } }
+
+  /* ---------- Logos ---------- */
+  .logo-card { border: 2px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-1); display: grid; }
+  .logo-card__stage { display: grid; place-items: center; min-height: 240px; padding: 28px; }
+  .logo-card__stage img { max-height: 190px; width: auto; }
+  .logo-card__body { padding: 16px 20px 20px; border-top: 2px solid var(--encre); }
+  .logo-card__body h4 { margin: 0 0 4px; font-size: var(--fs-lg); }
+  .logo-card__body p { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
+  .dl { display: inline-flex; gap: 6px; align-items: center; margin-top: 10px; font-weight: 700; font-size: var(--fs-sm); color: var(--brasier); text-decoration: none; min-height: 32px; }
+  .dl:hover { text-decoration: underline; }
+  .dl svg { width: 16px; height: 16px; }
+  .bg-red { background: var(--brasier); } .bg-ink { background: var(--encre); } .bg-yellow { background: var(--soleil); } .bg-green { background: var(--panneau); }
+  .bg-check { background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 20px 20px; }
+  .clear { display: grid; place-items: center; padding: 40px 24px; background: var(--brasier); border-radius: var(--r-lg); border: 2px solid var(--encre); }
+  .clear__box { position: relative; outline: 2px dashed rgba(255,255,255,.85); padding: 36px; }
+  .clear__box img { width: min(260px, 60vw); }
+  .clear__box::before { content: "X"; position: absolute; top: 4px; left: 8px; font: 400 1rem var(--font-display); color: #fff; }
+  .rules { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 900px) { .rules { grid-template-columns: repeat(4, 1fr); } }
+  .rule { border-radius: var(--r-md); overflow: hidden; border: 2px solid var(--encre); background: var(--surface); }
+  .rule__stage { height: 150px; display: grid; place-items: center; padding: 16px; overflow: hidden; }
+  .rule__stage img { max-height: 110px; width: auto; }
+  .rule p { margin: 0; padding: 10px 12px; font-size: var(--fs-sm); font-weight: 600; display: flex; gap: 8px; align-items: flex-start; border-top: 2px solid var(--encre); }
+  .rule p svg { width: 18px; height: 18px; flex: none; color: var(--danger); }
+
+  /* ---------- Couleurs ---------- */
+  .swatches { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .sw { border: 2px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-1); }
+  .sw__chip { height: 130px; padding: 14px 16px; display: flex; align-items: flex-end; justify-content: space-between; font: 400 1.5rem var(--font-display); text-transform: uppercase; }
+  .sw__body { padding: 14px 16px; display: grid; gap: 8px; }
+  .sw__body p { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+  .codes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .copy { font: 600 var(--fs-xs) ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); border: 1.5px solid var(--border); border-radius: 6px; padding: 6px 8px; cursor: pointer; color: var(--text); min-height: 32px; transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+  .copy:hover { border-color: var(--text); }
+  .copy.ok { background: var(--panneau); color: #fff; border-color: var(--panneau); }
+  .ratio { display: flex; height: 76px; border-radius: var(--r-lg); overflow: hidden; border: 2px solid var(--encre); }
+  .ratio div { display: grid; place-items: center; font-weight: 800; font-size: var(--fs-sm); text-align: center; padding: 4px; color: var(--encre); }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  .table-wrap { overflow-x: auto; border: 2px solid var(--encre); border-radius: var(--r-lg); background: var(--surface); }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1.5px solid var(--border); vertical-align: middle; }
+  th { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  .pair { display: inline-flex; align-items: center; justify-content: center; min-width: 130px; padding: 8px 12px; border-radius: 8px; font-weight: 800; white-space: nowrap; }
+  .verdict { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
+  .verdict svg { width: 16px; height: 16px; flex: none; }
+  .v-ok { color: var(--success); } .v-mid { color: #8A5A00; } .v-no { color: var(--danger); }
+
+  /* ---------- Typo ---------- */
+  .type-spec { display: grid; gap: 16px; }
+  @media (min-width: 900px) { .type-spec { grid-template-columns: 1fr 1fr; } }
+  .font-card { border: 2px solid var(--encre); border-radius: var(--r-lg); padding: 24px; background: var(--surface); box-shadow: var(--shadow-1); display: grid; gap: 10px; align-content: start; }
+  .font-card .label { color: var(--text-muted); font-weight: 700; font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: .1em; }
+  .font-card .big { font-size: clamp(4rem, 12vw, 7rem); line-height: .9; }
+  .font-card .alpha { font-size: var(--fs-lg); overflow-wrap: anywhere; color: var(--text-muted); }
+  .scale { display: grid; border: 2px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
+  .scale div { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: baseline; padding: 14px 18px; border-bottom: 1.5px solid var(--border); }
+  .scale div:last-child { border-bottom: 0; }
+  .scale code { font-size: var(--fs-xs); color: var(--text-muted); }
+  .scale span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 560px) { .scale div { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* ---------- Éléments graphiques ---------- */
+  .stage { border: 2px solid var(--encre); border-radius: var(--r-lg); min-height: 220px; display: grid; place-items: center; gap: 14px; padding: 28px; overflow: hidden; }
+  .tile { padding: 0; overflow: hidden; }
+  .tile .stage { border: 0; border-radius: 0; }
+  .tile > div:last-child { padding: 16px 20px; }
+  .post { display: grid; place-items: center; gap: 12px; }
+  .post__pole { width: 14px; height: 70px; background: linear-gradient(90deg, #8f9499, #e3e6e8 45%, #8f9499); border-radius: 4px; margin-top: -8px; }
+  .lava-sample { min-height: 220px; }
+  .pin { display: flex; gap: 10px; align-items: flex-start; font-weight: 800; text-transform: uppercase; color: #fff; line-height: 1.25; margin: 0; }
+  .pin svg { color: var(--soleil); width: 30px; height: 30px; flex: none; }
+
+  /* ---------- Icônes ---------- */
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  .ico { display: grid; justify-items: center; gap: 8px; padding: 16px 8px; border: 1.5px solid var(--border); border-radius: var(--r-md); background: var(--surface); font-size: var(--fs-xs); font-weight: 600; text-align: center; }
+  .ico svg { width: 28px; height: 28px; color: var(--brasier); }
+
+  /* ---------- Composants ---------- */
+  .comp-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 24px; border: 2px solid var(--encre); border-radius: var(--r-lg); background: var(--surface); }
+  .comp-row.red { background: var(--brasier); }
+  .comp-row .btn--ghost { color: var(--text); }
+  .comp-row.red .btn--ghost { color: #fff; }
+  .field-demo { display: grid; gap: 6px; min-width: min(100%, 240px); flex: 1; }
+  .field-demo label { font-weight: 700; font-size: var(--fs-sm); }
+  .field-demo input { font: inherit; min-height: 50px; padding: 12px 14px; border: 2px solid #A8937C; border-radius: var(--r-sm); background: #fff; color: var(--encre); }
+  .field-demo.focus input { border-color: var(--encre); box-shadow: 0 0 0 3px color-mix(in srgb, var(--soleil) 60%, transparent); outline: none; }
+  .field-demo.err input { border-color: var(--danger); }
+  .field-demo small { font-size: var(--fs-sm); color: var(--text-muted); }
+  .field-demo.err small { color: var(--danger); font-weight: 600; }
+  .mini-pass { display: grid; grid-template-columns: 1fr 76px; border: 2.5px solid var(--encre); border-radius: var(--r-md); overflow: hidden; min-width: min(100%, 280px); flex: 1; box-shadow: var(--shadow-1); }
+  .mini-pass > div:first-child { background: var(--brasier); color: #fff; padding: 14px 16px; }
+  .mini-pass .display { font-size: 1.8rem; }
+  .mini-pass .stub { display: grid; place-items: center; border-left: 3px dashed rgba(27,18,16,.6); font: 400 1.3rem var(--font-display); writing-mode: vertical-rl; transform: rotate(180deg); color: var(--encre); }
+  .toast { display: flex; gap: 12px; align-items: center; background: var(--encre); color: var(--creme); padding: 14px 18px; border-radius: var(--r-md); border-left: 6px solid var(--citron); font-weight: 600; }
+  .toast svg { color: var(--citron); width: 22px; height: 22px; flex: none; }
+  .gauge { flex: 1; min-width: min(100%, 280px); }
+  .gauge__bar { height: 12px; border-radius: 99px; background: rgba(27,18,16,.35); overflow: hidden; }
+  .gauge__bar i { display: block; height: 100%; width: 62%; background: linear-gradient(90deg, var(--soleil), var(--citron)); }
+  .gauge p { display: flex; justify-content: space-between; color: #fff; font-weight: 600; font-size: var(--fs-sm); margin: 6px 0 0; }
+
+  /* ---------- Ton ---------- */
+  .voice { display: grid; gap: 16px; }
+  @media (min-width: 800px) { .voice { grid-template-columns: repeat(2, 1fr); } }
+  .say { border-radius: var(--r-lg); padding: 20px 22px; border: 2px solid var(--encre); background: var(--surface); }
+  .say h4 { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; font-size: var(--fs-lg); }
+  .say h4 svg { width: 20px; height: 20px; }
+  .say.yes h4 { color: var(--success); } .say.no h4 { color: var(--danger); }
+  .say ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  .chat { background: #ECE5DD; border: 2px solid var(--encre); border-radius: var(--r-lg); padding: 24px; }
+  .bubble { max-width: 520px; background: #DCF8C6; color: #111; border-radius: 14px 14px 14px 4px; padding: 14px 16px; box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+  .bubble small { display: block; text-align: right; color: #556; margin-top: 6px; font-size: var(--fs-xs); }
+
+  /* ---------- Déclinaisons ---------- */
+  .decl { display: grid; gap: 24px; align-items: start; }
+  @media (min-width: 900px) { .decl { grid-template-columns: 300px 1fr; } }
+  .story { aspect-ratio: 9/16; max-width: 300px; margin-inline: auto; border-radius: 22px; border: 2.5px solid var(--encre); overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; padding: 22px 18px; gap: 12px; text-align: center; box-shadow: var(--shadow-2); }
+  .story img.lg { width: 100%; align-self: center; }
+  .story .row { display: flex; justify-content: center; align-items: center; gap: 8px; }
+  .story .row img { height: 26px; width: auto; }
+  .decl__side { display: grid; gap: 20px; }
+  .decl__pair { display: grid; gap: 16px; }
+  @media (min-width: 700px) { .decl__pair { grid-template-columns: 340px 1fr; align-items: center; } }
+  .square { aspect-ratio: 1; width: 100%; max-width: 340px; border-radius: 18px; border: 2.5px solid var(--encre); overflow: hidden; display: grid; place-items: center; padding: 18px; position: relative; box-shadow: var(--shadow-2); }
+  .square .display { font-size: 5rem; color: var(--soleil); text-align: center; }
+  .banner { border-radius: 18px; border: 2.5px solid var(--encre); overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; flex-wrap: wrap; box-shadow: var(--shadow-2); }
+  .banner img { height: 80px; width: auto; }
+
+  /* ---------- Maquette ---------- */
+  .devices { display: grid; gap: 28px; align-items: start; }
+  @media (min-width: 1000px) { .devices { grid-template-columns: 1fr 320px; } }
+  .browser { border: 2.5px solid var(--encre); border-radius: 16px; overflow: hidden; background: var(--encre); box-shadow: var(--shadow-2); }
+  .browser__bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: #bbb; font-size: var(--fs-xs); }
+  .browser__bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--flamme); display: inline-block; }
+  .browser__bar i:nth-child(2) { background: var(--soleil); } .browser__bar i:nth-child(3) { background: var(--citron); }
+  .browser__bar span { margin-left: 10px; background: #2c201c; border-radius: 99px; padding: 4px 12px; color: #eee; }
+  .browser__view { height: 600px; overflow: hidden; background: var(--creme); }
+  .browser__view iframe { width: 1440px; height: calc(600px / var(--k, .5)); border: 0; transform: scale(var(--k, .5)); transform-origin: 0 0; }
+  .phone { width: 320px; max-width: 100%; margin-inline: auto; border: 10px solid var(--encre); border-radius: 44px; overflow: hidden; height: 660px; box-shadow: var(--shadow-2); background: var(--encre); }
+  .phone iframe { width: 375px; height: 750px; border: 0; transform: scale(.8); transform-origin: 0 0; }
+  @media (max-width: 999px) { .browser { display: none; } }
+
+  /* ---------- Checklist ---------- */
+  .check { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .check li { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
+  .check li svg { flex: none; width: 22px; height: 22px; color: var(--success); margin-top: 1px; }
+  .check li.pending svg { color: #8A5A00; }
+
+  pre { margin: 0; background: var(--encre); color: var(--creme); padding: 22px; padding-top: 64px; border-radius: var(--r-lg); overflow-x: auto; font-size: var(--fs-sm); line-height: 1.55; border: 2px solid #3E2A22; }
+  .code-wrap { position: relative; }
+  .code-wrap .btn { position: absolute; top: 12px; right: 12px; min-height: 40px; padding: 8px 14px; font-size: var(--fs-xs); }
+
+  footer { background: var(--braise); color: var(--creme); padding: 40px 0; font-size: var(--fs-sm); }
+  .foot { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between; }
+  .foot img { height: 38px; width: auto; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; }
+    :root:not([data-theme="light"]) .ch__num { color: var(--flamme); }
+    :root:not([data-theme="light"]) .dl { color: var(--soleil); }
+  }
+  @media print {
+    .toc, .cover__ctas, .code-wrap .btn, #ch-maquette { display: none !important; }
+    .ch { padding: 28px 0; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#ch-evenement">Aller au contenu</a>
+
+<!-- =================== COUVERTURE =================== -->
+<header class="cover lava">
+  <div class="wrap">
+    <div class="cover__top">
+      <span style="display:flex;align-items:center;gap:12px">
+        <img src="assets/logos/babierland.webp" alt="Babierland" width="96" height="34">
+        <span aria-hidden="true">×</span>
+        <img src="assets/logos/art-of-the-new-wave.webp" alt="Art of the New Wave" width="70" height="34">
+      </span>
+      <span>Charte graphique · v1.0 · Octobre 2026</span>
+    </div>
+    <div class="cover__grid">
+      <div>
+        <h1 class="display">Charte<span>graphique</span></h1>
+        <p>Toutes les règles pour que Babierland City garde la même énergie partout : sur le site, les réseaux, les tickets, les flyers et le terrain le soir du 1er janvier 2027.</p>
+        <div class="cover__chips">
+          <span class="chip"><i data-lucide="calendar-days"></i>1er janvier 2027 · 20h</span>
+          <span class="chip"><i data-lucide="map-pin"></i>Terrain de Marco, Adzopé</span>
+          <span class="chip"><i data-lucide="users"></i>15 – 30 ans</span>
+        </div>
+        <div class="cover__ctas">
+          <a class="btn btn--lg" href="maquette.html"><i data-lucide="monitor-smartphone"></i>Voir la maquette du site</a>
+          <a class="btn btn--ghost btn--lg" href="charte-graphique-babierland-city.pdf" download><i data-lucide="file-down"></i>Télécharger le PDF</a>
+        </div>
+      </div>
+      <img class="cover__logo" src="assets/logos/babierland-city.webp" alt="Logo Babierland City" width="694" height="516">
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sommaire de la charte">
+  <ol>
+    <li><a href="#ch-evenement">L'événement</a></li>
+    <li><a href="#ch-univers">Univers</a></li>
+    <li><a href="#ch-logos">Logos</a></li>
+    <li><a href="#ch-couleurs">Couleurs</a></li>
+    <li><a href="#ch-typo">Typographie</a></li>
+    <li><a href="#ch-elements">Éléments graphiques</a></li>
+    <li><a href="#ch-icones">Icônes</a></li>
+    <li><a href="#ch-composants">Composants web</a></li>
+    <li><a href="#ch-ton">Ton &amp; messages</a></li>
+    <li><a href="#ch-declinaisons">Déclinaisons</a></li>
+    <li><a href="#ch-maquette">Maquette</a></li>
+    <li><a href="#ch-tokens">Tokens</a></li>
+    <li><a href="#ch-suivi">À compléter</a></li>
+  </ol>
+</nav>
+
+<main>
+<!-- =================== 01 ÉVÉNEMENT =================== -->
+<section class="ch" id="ch-evenement" aria-labelledby="h-evt">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">01</span><h2 id="h-evt">L'événement</h2>
+      <p class="ch__intro">Babierland City, c'est <strong>la</strong> soirée festive de la jeunesse d'Adzopé : ambiance DJ, jeux et prestations artistiques pour mettre en lumière les talents d'ici.</p></div>
+    <div class="grid g2">
+      <div class="panel">
+        <dl class="kv">
+          <dt>Nom</dt><dd>Babierland City</dd>
+          <dt>Organisé par</dt><dd>Babierland × Art of the New Wave</dd>
+          <dt>Date</dt><dd>Vendredi 1er janvier 2027 · 20h</dd>
+          <dt>Lieu</dt><dd>Terrain de Marco (Amakpétabois), Adzopé, Côte d'Ivoire</dd>
+          <dt>Public</dt><dd>La jeunesse, de 15 à 30 ans</dd>
+          <dt>Jauge</dt><dd>300 personnes maximum</dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <dl class="kv">
+          <dt>Pass Solo</dt><dd>6 000 F · 1 personne · ticket jaune</dd>
+          <dt>Pass Duo</dt><dd>10 000 F · 2 personnes · ticket vert citron</dd>
+          <dt>Paiement</dt><dd>Wave, Orange Money, MTN MoMo, Moov Money</dd>
+          <dt>Contacts</dt><dd>01 72 02 40 10 · 01 01 90 88 32</dd>
+          <dt>E-mail</dt><dd>babierlandcity@gmail.com</dd>
+          <dt>Réseaux</dt><dd>@Babierlandcity</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 02 UNIVERS =================== -->
+<section class="ch" id="ch-univers" aria-labelledby="h-univ">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">02</span><h2 id="h-univ">Univers &amp; ambiance</h2>
+      <p class="ch__intro">L'affiche donne le ton : de la lave orange qui bouge, un titre jaune bien gonflé et des panneaux de rue verts qui relient Abidjan à Adzopé. On garde cette énergie urbaine, chaude et festive partout.</p></div>
+    <div class="words" aria-label="Mots-clés de la marque">
+      <span class="word" style="background:var(--brasier);color:#fff">Urbain</span>
+      <span class="word" style="background:var(--soleil)">Festif</span>
+      <span class="word" style="background:var(--flamme)">Chaud</span>
+      <span class="word" style="background:var(--panneau);color:#fff">Street</span>
+      <span class="word" style="background:var(--citron)">Jeune</span>
+      <span class="word" style="background:#fff">Fier d'Adzopé</span>
+    </div>
+    <h3 class="sub">Les visuels de référence</h3>
+    <div class="mood">
+      <figure><img src="assets/visuels/affiche.webp" alt="Affiche officielle de Babierland City" width="843" height="1264" loading="lazy"><figcaption>Affiche officielle</figcaption></figure>
+      <figure><img src="assets/visuels/logo-city-fond-orange.webp" alt="Logo Babierland City sur fond de lave orange" width="922" height="1152" loading="lazy"><figcaption>Logo sur texture lave</figcaption></figure>
+      <figure class="wide"><img src="assets/visuels/tickets.webp" alt="Tickets Pass Solo et Pass Duo" width="928" height="1152" loading="lazy" style="object-fit:contain;background:#D8DCDF"><figcaption>Tickets Solo &amp; Duo</figcaption></figure>
+    </div>
+    <h3 class="sub">Les 4 piliers visuels</h3>
+    <div class="grid g4">
+      <div class="panel"><h4>La lave</h4><p>Fond rouge-orangé en volutes. C'est le décor de toutes les pièces principales.</p></div>
+      <div class="panel"><h4>Le titre bulle</h4><p>Le lettrage jaune, gonflé et brillant. On n'y touche jamais : c'est le logo.</p></div>
+      <div class="panel"><h4>Le panneau de rue</h4><p>Le vert des panneaux Abidjan / Adzopé. Il signale les lieux, les rubriques et les infos clés.</p></div>
+      <div class="panel"><h4>Le ticket</h4><p>Le talon prédécoupé jaune (Solo) ou citron (Duo), avec le prix en colonne.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 03 LOGOS =================== -->
+<section class="ch" id="ch-logos" aria-labelledby="h-logos">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">03</span><h2 id="h-logos">Logos</h2>
+      <p class="ch__intro">Trois logos cohabitent. <strong>Babierland City</strong> est la vedette. <strong>Babierland</strong> et <strong>Art of the New Wave</strong> signent l'événement en duo, toujours en haut ou en bas, séparés par un « × ».</p></div>
+    <div class="grid g3">
+      <article class="logo-card"><div class="logo-card__stage bg-red"><img src="assets/logos/babierland-city.webp" alt="Logo Babierland City" width="694" height="516" loading="lazy"></div>
+        <div class="logo-card__body"><h4>Babierland City</h4><p>Logo principal. Toujours en grand, au centre de la composition.</p><a class="dl" href="assets/logos/babierland-city.png" download><i data-lucide="download"></i>PNG transparent</a></div></article>
+      <article class="logo-card"><div class="logo-card__stage bg-check"><img src="assets/logos/babierland.webp" alt="Logo Babierland" width="900" height="319" loading="lazy"></div>
+        <div class="logo-card__body"><h4>Babierland</h4><p>Organisateur. Graffiti rouge et jaune, contour blanc intégré.</p><a class="dl" href="assets/logos/babierland.png" download><i data-lucide="download"></i>PNG transparent</a></div></article>
+      <article class="logo-card"><div class="logo-card__stage bg-check"><img src="assets/logos/art-of-the-new-wave.webp" alt="Logo Art of the New Wave" width="618" height="298" loading="lazy"></div>
+        <div class="logo-card__body"><h4>Art of the New Wave</h4><p>Co-organisateur. Vert, jaune et noir, contour violet.</p><a class="dl" href="assets/logos/art-of-the-new-wave.png" download><i data-lucide="download"></i>PNG transparent</a></div></article>
+    </div>
+
+    <h3 class="sub">Fonds autorisés</h3>
+    <div class="grid g4">
+      <div class="stage bg-red"><img src="assets/logos/babierland-city.webp" alt="Logo sur rouge brasier" style="max-height:130px;width:auto" loading="lazy"></div>
+      <div class="stage lava"><img src="assets/logos/babierland-city.webp" alt="Logo sur texture lave" style="max-height:130px;width:auto" loading="lazy"></div>
+      <div class="stage bg-ink"><img src="assets/logos/babierland-city.webp" alt="Logo sur noir encre" style="max-height:130px;width:auto" loading="lazy"></div>
+      <div class="stage bg-green"><img src="assets/logos/babierland-city.webp" alt="Logo sur vert panneau" style="max-height:130px;width:auto" loading="lazy"></div>
+    </div>
+
+    <h3 class="sub">Zone de protection &amp; tailles minimales</h3>
+    <div class="grid g2">
+      <div class="clear"><div class="clear__box"><img src="assets/logos/babierland-city.webp" alt="Zone de protection autour du logo" loading="lazy"></div></div>
+      <div class="panel" style="display:grid;gap:6px;align-content:center">
+        <h4>Règle du « X »</h4>
+        <p>X = la hauteur de la lettre « C » de CITY. Laisse au moins <strong>1 X</strong> de vide autour du logo : aucun texte, bord ou autre logo dans cette zone.</p>
+        <h4 style="margin-top:12px">Tailles minimales</h4>
+        <p>Babierland City : <strong>120 px</strong> de large à l'écran, <strong>30 mm</strong> en impression.<br>Babierland et Art of the New Wave : <strong>80 px</strong> / <strong>20 mm</strong>.</p>
+        <h4 style="margin-top:12px">Co-signature</h4>
+        <p>Babierland × Art of the New Wave : même hauteur visuelle, « × » blanc en Rubik Black, puis « PRÉSENTENT » en dessous.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">À ne pas faire</h3>
+    <div class="rules">
+      <div class="rule"><div class="rule__stage bg-red"><img src="assets/logos/babierland-city.webp" alt="" style="transform:scaleX(1.5)" loading="lazy"></div><p><i data-lucide="circle-x"></i>Déformer ou étirer</p></div>
+      <div class="rule"><div class="rule__stage bg-red"><img src="assets/logos/babierland-city.webp" alt="" style="filter:hue-rotate(160deg) saturate(1.4)" loading="lazy"></div><p><i data-lucide="circle-x"></i>Changer les couleurs</p></div>
+      <div class="rule"><div class="rule__stage bg-yellow"><img src="assets/logos/babierland-city.webp" alt="" loading="lazy"></div><p><i data-lucide="circle-x"></i>Poser sur du jaune : le logo disparaît</p></div>
+      <div class="rule"><div class="rule__stage" style="background:url(assets/visuels/affiche.webp) center 70%/cover"><img src="assets/logos/babierland-city.webp" alt="" style="transform:rotate(18deg)" loading="lazy"></div><p><i data-lucide="circle-x"></i>Tourner ou poser sur une image chargée</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 04 COULEURS =================== -->
+<section class="ch" id="ch-couleurs" aria-labelledby="h-col">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">04</span><h2 id="h-col">Couleurs</h2>
+      <p class="ch__intro">Couleurs relevées directement sur l'affiche, les tickets et le logo officiels. Clique sur un code pour le copier.</p></div>
+    <div class="swatches" id="swatches"></div>
+
+    <h3 class="sub">Proportions</h3>
+    <div class="ratio" role="img" aria-label="Répartition des couleurs : 55 % rouge, 20 % crème, 12 % jaune, 8 % vert, 5 % citron">
+      <div style="flex:55;background:var(--brasier);color:#fff">Brasier 55 %</div>
+      <div style="flex:20;background:var(--creme)">Crème 20 %</div>
+      <div style="flex:12;background:var(--soleil)">Soleil 12 %</div>
+      <div style="flex:8;background:var(--panneau);color:#fff">Vert 8 %</div>
+      <div style="flex:5;background:var(--citron)">5 %</div>
+    </div>
+    <p class="muted" style="margin-top:12px">Le rouge domine (fonds, en-têtes), le crème laisse respirer le contenu, le jaune attire l'œil sur l'action, le vert signale les infos pratiques. Le citron est réservé au Pass Duo et aux confirmations.</p>
+
+    <h3 class="sub">Contrastes vérifiés (WCAG 2.2)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Combinaison</th><th>Ratio</th><th>Utilisation</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pair" style="background:var(--soleil);color:var(--encre)">Encre / Soleil</span></td><td>11,1 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Tout texte · boutons principaux</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--creme);color:var(--encre);outline:1px solid var(--border)">Encre / Crème</span></td><td>17,2 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Texte courant</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--citron);color:var(--encre)">Encre / Citron</span></td><td>11,1 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Tout texte</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--panneau);color:#fff">Blanc / Vert</span></td><td>6,4 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Tout texte</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--brasier);color:#fff">Blanc / Brasier</span></td><td>5,2 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Tout texte</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--creme);color:var(--brasier);outline:1px solid var(--border)">Brasier / Crème</span></td><td>4,9 : 1</td><td><span class="verdict v-ok"><i data-lucide="circle-check"></i>Titres, liens, prix</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--panneau);color:var(--soleil)">Soleil / Vert</span></td><td>3,8 : 1</td><td><span class="verdict v-mid"><i data-lucide="triangle-alert"></i>Gros texte seulement (panneaux)</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--brasier);color:var(--soleil)">Soleil / Brasier</span></td><td>3,2 : 1</td><td><span class="verdict v-mid"><i data-lucide="triangle-alert"></i>Gros titres ≥ 24 px seulement</span></td></tr>
+          <tr><td><span class="pair" style="background:var(--flamme);color:#fff">Blanc / Flamme</span></td><td>3,1 : 1</td><td><span class="verdict v-no"><i data-lucide="circle-x"></i>À éviter pour du texte · encre à la place (6 : 1)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 05 TYPO =================== -->
+<section class="ch" id="ch-typo" aria-labelledby="h-typo">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">05</span><h2 id="h-typo">Typographie</h2>
+      <p class="ch__intro">Deux familles Google Fonts gratuites. <strong>Anton</strong> pour crier (titres, dates, prix), comme sur les tickets. <strong>Rubik</strong> pour parler (textes, boutons, panneaux) : ses angles arrondis rappellent le logo bulle.</p></div>
+    <div class="type-spec">
+      <div class="font-card">
+        <span class="label">Titrage · Anton Regular</span>
+        <span class="display big">Aa 1er</span>
+        <span class="alpha display">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 · 6 000 F</span>
+        <p class="muted" style="margin:0">Toujours en MAJUSCULES. Interlignage 0,95 à 1,05. Jamais pour un paragraphe.</p>
+      </div>
+      <div class="font-card">
+        <span class="label">Texte &amp; interface · Rubik 400 → 900</span>
+        <span class="big" style="font-weight:900">Aa</span>
+        <span class="alpha">Abcdefghijklmnopqrstuvwxyz · éèàçô · 0123456789</span>
+        <p class="muted" style="margin:0">400 texte · 600 liens · 700 boutons · 800 sous-titres · 900 panneaux. Minimum 16 px sur mobile.</p>
+      </div>
+    </div>
+    <h3 class="sub">Échelle</h3>
+    <div class="scale">
+      <div><code>Display · 96 / 48</code><span class="display" style="font-size:clamp(2.4rem,7vw,5rem)">Babierland City</span></div>
+      <div><code>H2 · 64 / 40</code><span class="display" style="font-size:clamp(2rem,5vw,3.4rem)">Choisis ton pass</span></div>
+      <div><code>H3 · 24 · 800</code><span style="font-size:1.5rem;font-weight:800">Infos pratiques</span></div>
+      <div><code>Lead · 18 · 400</code><span style="font-size:1.125rem">La soirée festive de la jeunesse d'Adzopé.</span></div>
+      <div><code>Body · 16 · 400</code><span>Rendez-vous le 1er janvier 2027 à 20h au Terrain de Marco.</span></div>
+      <div><code>Label · 14 · 700</code><span style="font-size:.875rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em">Pass &amp; tarifs</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 06 ÉLÉMENTS =================== -->
+<section class="ch" id="ch-elements" aria-labelledby="h-el">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">06</span><h2 id="h-el">Éléments graphiques</h2>
+      <p class="ch__intro">Les éléments signature de l'affiche, recréés en CSS pour le web : nets à toutes les tailles et légers.</p></div>
+    <div class="grid g3">
+      <div class="panel tile"><div class="stage lava"><div class="post"><span class="sign">Abidjan</span><span class="sign sign--right">Adzopé</span><span class="post__pole" aria-hidden="true"></span></div></div>
+        <div><h4>Panneau de rue</h4><p>Vert, double filet blanc, texte jaune Rubik 900. Incliné de −4° à +3°. Pour les lieux et les rubriques.</p></div></div>
+      <div class="panel tile"><div class="stage lava"><div class="date-badge" style="font-size:1.4rem"><b>1</b>JANVIER<br>2027</div></div>
+        <div><h4>Badge date</h4><p>Bloc orange aux bords irréguliers, Anton blanc. Réservé à la date (texte ≥ 24 px).</p></div></div>
+      <div class="panel tile"><div class="stage lava"><p class="pin"><i data-lucide="map-pin"></i>Terrain de Marco<br>(Amakpétabois)</p></div>
+        <div><h4>Pin de lieu</h4><p>Icône pin jaune + adresse en Rubik 800 capitales, blanc.</p></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="panel tile"><div class="lava-sample lava"></div>
+        <div><h4>Texture lave</h4><p>Volutes rouges et orange extraites du visuel officiel, adoucies par deux dégradés. Fond des en-têtes, du contact et des visuels réseaux.</p></div></div>
+      <div class="panel tile"><div class="stage" style="background:var(--creme)"><div class="mini-pass" style="max-width:340px"><div><span class="display">Pass Duo</span><br>2 personnes</div><div class="stub" style="background:var(--citron)">10 000 F</div></div></div>
+        <div><h4>Ticket</h4><p>Corps rouge + talon en pointillés. Jaune = Solo, citron = Duo. Prix en Anton, à la verticale.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 07 ICÔNES =================== -->
+<section class="ch" id="ch-icones" aria-labelledby="h-ico">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">07</span><h2 id="h-ico">Icônes</h2>
+      <p class="ch__intro">Une seule famille : <strong>Lucide</strong> (open source), trait de 2,25 px, angles arrondis. Tailles 16 / 20 / 24 / 28 px. Pas d'emoji à la place des icônes dans l'interface (ils restent permis dans les messages WhatsApp).</p></div>
+    <div class="icons" id="icons"></div>
+  </div>
+</section>
+
+<!-- =================== 08 COMPOSANTS =================== -->
+<section class="ch" id="ch-composants" aria-labelledby="h-comp">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">08</span><h2 id="h-comp">Composants web</h2>
+      <p class="ch__intro">Style « bloc vibrant » : contours encre de 2,5 px, ombre portée pleine (jamais floue), coins arrondis, zones tactiles de 48 px minimum.</p></div>
+    <h3 class="sub" style="margin-top:0">Boutons</h3>
+    <div class="comp-row">
+      <a class="btn" href="#ch-composants"><i data-lucide="ticket"></i>Réserver mon pass</a>
+      <a class="btn btn--primary" href="#ch-composants">Payer 6 000 F</a>
+      <a class="btn btn--green" href="#ch-composants"><i data-lucide="navigation"></i>Itinéraire</a>
+      <a class="btn btn--ghost" href="#ch-composants">Retour</a>
+      <button class="btn" type="button" disabled>Complet</button>
+    </div>
+    <p class="muted" style="margin:10px 0 0;font-size:var(--fs-sm)">Un seul bouton jaune par écran : c'est l'action principale. Survol : il monte de 2 px. Appui : il s'enfonce. Désactivé : 45 % d'opacité.</p>
+    <div class="comp-row red" style="margin-top:14px">
+      <a class="btn" href="#ch-composants">Sur fond rouge</a>
+      <a class="btn btn--ghost" href="#ch-composants">Secondaire</a>
+      <div class="gauge"><div class="gauge__bar" role="progressbar" aria-valuenow="186" aria-valuemin="0" aria-valuemax="300" aria-label="Jauge de places"><i></i></div><p><span>186 / 300 places parties</span><span>114 restantes</span></p></div>
+    </div>
+
+    <h3 class="sub">Champs de formulaire</h3>
+    <div class="comp-row">
+      <div class="field-demo"><label for="d1">Prénom *</label><input id="d1" value="Awa"><small>Champ normal</small></div>
+      <div class="field-demo focus"><label for="d2">Téléphone WhatsApp *</label><input id="d2" value="07 00 00 00 00"><small>Focus : halo jaune</small></div>
+      <div class="field-demo err"><label for="d3">E-mail *</label><input id="d3" value="awa@gmail"><small>Adresse e-mail invalide (ex. nom@gmail.com).</small></div>
+    </div>
+
+    <h3 class="sub">Pass, pastilles &amp; notifications</h3>
+    <div class="comp-row">
+      <div class="mini-pass"><div><span class="display">Pass Solo</span><br>1 personne</div><div class="stub" style="background:var(--or-solo)">6 000 F</div></div>
+      <div class="mini-pass"><div><span class="display">Pass Duo</span><br>2 personnes</div><div class="stub" style="background:var(--citron)">10 000 F</div></div>
+    </div>
+    <div class="comp-row" style="margin-top:14px">
+      <span class="chip"><i data-lucide="calendar-days"></i>1er janv. 2027</span>
+      <span class="chip"><i data-lucide="clock-8"></i>20h</span>
+      <span class="chip"><i data-lucide="map-pin"></i>Adzopé</span>
+      <div class="toast" role="status"><i data-lucide="circle-check"></i>Paiement reçu ! Ton ticket part sur WhatsApp.</div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 09 TON =================== -->
+<section class="ch" id="ch-ton" aria-labelledby="h-ton">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">09</span><h2 id="h-ton">Ton &amp; messages</h2>
+      <p class="ch__intro">On parle comme un pote qui organise LA soirée : on tutoie, on est joyeux et direct, et on donne toujours l'info utile (date, lieu, prix).</p></div>
+    <div class="voice">
+      <div class="say yes"><h4><i data-lucide="circle-check"></i>On dit</h4><ul>
+        <li>« Réserve ta place », « Choisis ton pass »</li>
+        <li>« Plus que 40 places ! »</li>
+        <li>« On démarre l'année ensemble à Adzopé »</li>
+        <li>Prix au format « 6 000 F »</li>
+        <li>Numéros au format « 01 72 02 40 10 »</li>
+      </ul></div>
+      <div class="say no"><h4><i data-lucide="circle-x"></i>On évite</h4><ul>
+        <li>Le vouvoiement administratif (« Veuillez procéder… »)</li>
+        <li>Les erreurs vagues (« Champ invalide »)</li>
+        <li>Les promesses non confirmées (artistes non annoncés)</li>
+        <li>Les numéros personnels de l'équipe en public</li>
+        <li>« 6000 FCFA », « 6.000F » : un seul format</li>
+      </ul></div>
+    </div>
+    <h3 class="sub">Message de confirmation (WhatsApp / e-mail)</h3>
+    <div class="chat"><div class="bubble">Ton inscription à <strong>Babierland City</strong> est confirmée ! 🎉 Pass <strong>Duo</strong> n° <strong>DUO-027</strong>. Rendez-vous le <strong>1er janvier 2027 à 20h</strong> au Terrain de Marco, Amakpétabois (Adzopé). Prépare-toi pour une soirée d'ambiance avec DJ, jeux et talents ! 🔥<small>20:14 ✓✓</small></div></div>
+  </div>
+</section>
+
+<!-- =================== 10 DÉCLINAISONS =================== -->
+<section class="ch" id="ch-declinaisons" aria-labelledby="h-decl">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">10</span><h2 id="h-decl">Déclinaisons</h2>
+      <p class="ch__intro">Gabarits pour les réseaux. Toujours la même structure : signatures en haut, logo au centre, infos et action en bas.</p></div>
+    <div class="decl">
+      <div>
+        <div class="story lava">
+          <div class="row"><img src="assets/logos/babierland.webp" alt="" loading="lazy"><b>×</b><img src="assets/logos/art-of-the-new-wave.webp" alt="" loading="lazy"></div>
+          <img class="lg" src="assets/logos/babierland-city.webp" alt="Babierland City" loading="lazy">
+          <div style="display:grid;gap:14px;justify-items:center">
+            <div class="date-badge" style="font-size:1rem"><b>1</b>JANVIER · 20H</div>
+            <span class="sign" style="font-size:1rem">Adzopé</span>
+            <span class="btn" style="min-height:44px;font-size:.85rem">Réserve ton pass</span>
+          </div>
+        </div>
+        <p class="muted" style="text-align:center;font-size:var(--fs-sm)">Story Instagram / statut WhatsApp · 1080 × 1920</p>
+      </div>
+      <div class="decl__side">
+        <div class="decl__pair">
+          <div class="square lava">
+            <span class="sign" style="position:absolute;top:22px;left:18px;font-size:.9rem">Compte à rebours</span>
+            <span class="display">J-30</span>
+            <span style="position:absolute;bottom:20px;font-weight:800;text-transform:uppercase">1er janvier 2027 · Adzopé</span>
+          </div>
+          <p class="muted" style="margin:0">Post carré · 1080 × 1080. Pour le compte à rebours, les annonces de talents et les « Plus que X places ».</p>
+        </div>
+        <div class="banner lava">
+          <img src="assets/logos/babierland-city.webp" alt="Babierland City" loading="lazy">
+          <div style="display:grid;gap:4px;flex:1;min-width:220px"><span class="display" style="font-size:2rem">Solo 6 000 F · Duo 10 000 F</span><span style="font-weight:700">Terrain de Marco · 1er janvier 2027 · 20h</span></div>
+          <span class="btn">Réserver</span>
+        </div>
+        <p class="muted" style="margin:0">Bannière · 1500 × 500 (couverture Facebook / X, signature e-mail)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 11 MAQUETTE =================== -->
+<section class="ch" id="ch-maquette" aria-labelledby="h-maq">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">11</span><h2 id="h-maq">Maquette du site</h2>
+      <p class="ch__intro">Le site en une page : accueil avec compte à rebours et jauge, la soirée, infos pratiques et carte, pass, réservation en 3 étapes avec mobile money, équipe, FAQ et contact. Les aperçus ci-dessous sont interactifs.</p></div>
+    <div class="devices">
+      <div class="browser">
+        <div class="browser__bar"><i></i><i></i><i></i><span>babierlandcity.com</span></div>
+        <div class="browser__view" id="bview"><iframe src="maquette.html" title="Maquette du site sur ordinateur" loading="lazy"></iframe></div>
+      </div>
+      <div class="phone"><iframe src="maquette.html" title="Maquette du site sur mobile" loading="lazy"></iframe></div>
+    </div>
+    <p style="margin-top:22px"><a class="btn btn--primary btn--lg" href="maquette.html"><i data-lucide="external-link"></i>Ouvrir la maquette en plein écran</a></p>
+  </div>
+</section>
+
+<!-- =================== 12 TOKENS =================== -->
+<section class="ch" id="ch-tokens" aria-labelledby="h-tok">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">12</span><h2 id="h-tok">Tokens pour le développeur</h2>
+      <p class="ch__intro">À coller tel quel dans le CSS du site. Les composants n'utilisent jamais un code couleur en dur : toujours une variable.</p></div>
+    <div class="code-wrap">
+      <button class="btn" id="copyTokens" type="button"><i data-lucide="copy"></i>Copier</button>
+<pre id="tokens"><code>@import url('https://fonts.googleapis.com/css2?family=Anton&amp;family=Rubik:wght@400;500;600;700;800;900&amp;display=swap');
+
+:root {
+  /* Couleurs de marque */
+  --brasier: #D51D02;   /* rouge principal      */
+  --braise:  #7A0A02;   /* rouge profond        */
+  --flamme:  #F26A0F;   /* orange               */
+  --soleil:  #F7C21C;   /* jaune titre / CTA    */
+  --or-solo: #F1C40E;   /* Pass Solo            */
+  --citron:  #ADD906;   /* Pass Duo             */
+  --panneau: #2E6B45;   /* vert panneau         */
+  --creme:   #FFF6E5;   /* fond clair           */
+  --encre:   #1B1210;   /* texte / contours     */
+
+  /* Typo */
+  --font-display: "Anton", Impact, sans-serif;
+  --font-sans: "Rubik", system-ui, sans-serif;
+
+  /* Espacements 4/8 */
+  --s-1: 4px; --s-2: 8px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+  /* Formes &amp; ombres */
+  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-pill: 999px;
+  --shadow-1: 0 2px 0 rgba(27,18,16,.9);
+  --shadow-2: 0 6px 0 rgba(27,18,16,.9);
+
+  /* Mouvement */
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --dur-fast: 150ms; --dur: 220ms; --dur-slow: 320ms;
+}</code></pre>
+    </div>
+    <p class="muted" style="margin-top:12px">Fichier complet (thème sombre, boutons, panneau, badge, texture) : <a class="dl" href="assets/brand.css" download><i data-lucide="download"></i>brand.css</a></p>
+  </div>
+</section>
+
+<!-- =================== 13 SUIVI =================== -->
+<section class="ch" id="ch-suivi" aria-labelledby="h-suivi" style="border-bottom:0">
+  <div class="wrap">
+    <div class="ch__head"><span class="ch__num">13</span><h2 id="h-suivi">À compléter</h2>
+      <p class="ch__intro">Ce qu'il manque pour finaliser la marque et le site. Validation : Brou Yann (communication &amp; marketing).</p></div>
+    <ul class="check">
+      <li><i data-lucide="circle-check"></i><span>Couleurs, typographies, logos détourés et composants : prêts.</span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Logos en haute définition</strong> : PNG d'origine à fond transparent (les versions actuelles sont détourées depuis les aperçus). <span class="todo">À envoyer</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Vidéo teaser</strong> (24 s) pour l'accueil du site. <span class="todo">À envoyer</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Photos</strong> d'Alfred Kulai et de Junior Soumahoro, plus les originaux des 7 autres. <span class="todo">À envoyer</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Lien WhatsApp direct</strong> et <strong>compte TikTok</strong>. <span class="todo">À compléter</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Programme horaire</strong> de la soirée et noms des artistes. <span class="todo">Facultatif</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Répartition des tickets</strong> : option A proposée (100 Solo + 100 Duo = 300 personnes). <span class="todo">À valider</span></span></li>
+      <li class="pending"><i data-lucide="clock-3"></i><span><strong>Point Google Maps exact</strong> du Terrain de Marco. <span class="todo">À envoyer</span></span></li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span style="display:flex;align-items:center;gap:12px"><img src="assets/logos/babierland.webp" alt="Babierland" loading="lazy"><b aria-hidden="true">×</b><img src="assets/logos/art-of-the-new-wave.webp" alt="Art of the New Wave" loading="lazy"></span>
+    <span>Charte graphique Babierland City · v1.0 · Octobre 2026</span>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+  // ---- Nuancier ----
+  const COLORS = [
+    ['Brasier', '#D51D02', '213 29 2', 'Couleur principale. Fonds, en-têtes, bouton « Payer ».', '#fff'],
+    ['Braise', '#7A0A02', '122 10 2', 'Rouge profond : pied de page, ombres, contours.', '#fff'],
+    ['Flamme', '#F26A0F', '242 106 15', 'Orange des volutes : badge date, dégradés.', '#1B1210'],
+    ['Soleil', '#F7C21C', '247 194 28', 'Jaune du titre : boutons d’action, chiffres clés.', '#1B1210'],
+    ['Or Solo', '#F1C40E', '241 196 14', 'Talon du Pass Solo uniquement.', '#1B1210'],
+    ['Citron', '#ADD906', '173 217 6', 'Talon du Pass Duo, confirmations, jauge.', '#1B1210'],
+    ['Panneau', '#2E6B45', '46 107 69', 'Vert des panneaux : infos pratiques, rubriques.', '#fff'],
+    ['Crème', '#FFF6E5', '255 246 229', 'Fond des pages de contenu.', '#1B1210'],
+    ['Encre', '#1B1210', '27 18 16', 'Texte, contours, ombres pleines.', '#fff'],
+  ];
+  const cmyk = h => { const [r,g,b] = [1,3,5].map(i => parseInt(h.slice(i,i+2),16)/255); const k = 1 - Math.max(r,g,b); return [r,g,b].map(c => Math.round((1-c-k)/(1-k)*100)).concat(Math.round(k*100)).join(' '); };
+  document.getElementById('swatches').innerHTML = COLORS.map(([n, hex, rgb, use, fg]) => `
+    <article class="sw"><div class="sw__chip" style="background:${hex};color:${fg}"><span>${n}</span></div>
+      <div class="sw__body"><p>${use}</p><div class="codes">
+        <button class="copy" type="button" data-copy="${hex}" aria-label="Copier ${hex}">${hex}</button>
+        <button class="copy" type="button" data-copy="rgb(${rgb.replaceAll(' ', ', ')})">RGB ${rgb}</button>
+        <button class="copy" type="button" data-copy="${cmyk(hex)}">CMJN ${cmyk(hex)}</button>
+      </div></div></article>`).join('');
+
+  // ---- Icônes ----
+  const ICONS = [['ticket','Pass'],['map-pin','Lieu'],['calendar-days','Date'],['clock-8','Heure'],['disc-3','DJ'],['gamepad-2','Jeux'],['mic-vocal','Talents'],['users','Duo'],['user','Solo'],['smartphone','Mobile money'],['phone','Appel'],['mail','E-mail'],['at-sign','Réseaux'],['navigation','Itinéraire'],['circle-check','Validé'],['circle-alert','Erreur']];
+  document.getElementById('icons').innerHTML = ICONS.map(([i, l]) => `<div class="ico"><i data-lucide="${i}"></i>${l}</div>`).join('');
+
+  if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 2.25, 'aria-hidden': 'true' } });
+
+  // ---- Copier ----
+  async function copy(text, el) {
+    try { await navigator.clipboard.writeText(text); } catch { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    const old = el.innerHTML; el.classList.add('ok'); el.textContent = 'Copié !';
+    setTimeout(() => { el.classList.remove('ok'); el.innerHTML = old; }, 1400);
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-copy]'); if (b) copy(b.dataset.copy, b); });
+  document.getElementById('copyTokens').addEventListener('click', e => copy(document.getElementById('tokens').innerText, e.currentTarget));
+
+  // ---- Échelle de l'aperçu navigateur ----
+  const bv = document.getElementById('bview');
+  const fit = () => bv.style.setProperty('--k', (bv.clientWidth || 720) / 1440);
+  fit(); addEventListener('resize', fit);
+
+  // ---- Sommaire actif ----
+  const links = [...document.querySelectorAll('.toc a')];
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  }), { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('.ch').forEach(s => io.observe(s));
+</script>
+</body>
+</html>

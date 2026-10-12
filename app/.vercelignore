@@ -1,0 +1,8 @@
+node_modules
+.env
+.env.test
+.deploy.env
+.vercel
+tests
+scripts/sync-assets.sh
+*.csv

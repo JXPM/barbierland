@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "geniuspay": {
+      "type": "sse",
+      "url": "https://geniuspay.ci/api/mcp"
+    }
+  }
+}

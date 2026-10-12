@@ -1,0 +1,20 @@
+{
+  "name": "babierland-city-billetterie",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env scripts/dev-server.js",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
+    "sync-assets": "sh scripts/sync-assets.sh",
+    "test": "node --env-file-if-exists=.env.test --test --test-concurrency=1 tests/*.test.js",
+    "purger": "node --env-file-if-exists=.env scripts/purger.js",
+    "verifier-legal": "node scripts/verifier-legal.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4"
+  }
+}

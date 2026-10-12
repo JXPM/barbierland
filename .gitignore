@@ -1,0 +1,10 @@
+.vercel
+# Codes secrets des tickets : ne jamais pousser sur GitHub
+raw/billetterie/
+
+# captures de tests navigateur
+.playwright-mcp/
+
+# Brief : contient les numéros personnels de l'équipe (internes) ; dépôt public
+raw/Brief_Babierland_City_v7.docx
+raw/brief-babierland-city-v7.md

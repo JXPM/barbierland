@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon billet · Babierland City</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#D51D02">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/vendor/fonts.css">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+  body { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+  .top { display: flex; justify-content: center; padding: 18px 16px; }
+  .top img { height: 64px; width: auto; filter: drop-shadow(0 6px 14px rgba(122,10,2,.5)); }
+  main { width: min(460px, 100% - 32px); margin: 20px auto 32px; display: grid; gap: 18px; align-content: start; }
+
+  .ticket { border: 2.5px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-2); background: var(--brasier); color: var(--blanc); }
+  .ticket__head { padding: 20px 22px 18px; display: grid; gap: 6px; background-image: radial-gradient(120% 90% at 0 0, rgba(242,106,15,.6), transparent 60%); }
+  .ticket__pass { font: 400 2.6rem/1 var(--font-display); text-transform: uppercase; color: var(--soleil); margin: 0; }
+  .ticket__who { font-weight: 800; font-size: var(--fs-lg); line-height: 1.3; }
+  .ticket__meta { display: grid; gap: 2px; font-weight: 600; font-size: var(--fs-sm); color: #FFE9D6; }
+  .ticket__stub { position: relative; background: var(--or-solo); color: var(--encre); padding: 24px 22px 20px; display: grid; justify-items: center; gap: 10px; border-top: 3px dashed rgba(27,18,16,.6); }
+  .ticket.duo .ticket__stub { background: var(--citron); }
+  .qr { background: #fff; padding: 10px; border-radius: var(--r-md); border: 2.5px solid var(--encre); width: min(260px, 100%); aspect-ratio: 1; }
+  .qr svg { display: block; width: 100%; height: 100%; }
+  .numero { font: 400 2rem/1 var(--font-display); letter-spacing: .04em; }
+  .code { font: 700 var(--fs-sm) ui-monospace, monospace; letter-spacing: .06em; overflow-wrap: anywhere; text-align: center; }
+  .ticket.void .qr { opacity: .25; }
+
+  .banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-md); border: 2px solid var(--encre); font-weight: 600; background: var(--surface); }
+  .banner svg { flex: none; width: 22px; height: 22px; margin-top: 2px; }
+  .banner--danger { background: #FBE3E1; color: #7A1610; border-color: #7A1610; }
+  .banner--info { background: #E3F0E7; color: var(--panneau-fonce); border-color: var(--panneau-fonce); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .actions .btn--ghost { color: var(--text); }
+  .tips { margin: 0; padding-left: 20px; color: var(--text-muted); font-size: var(--fs-sm); }
+  .tips li { margin: 4px 0; }
+  .center { text-align: center; color: var(--text-muted); }
+  footer { text-align: center; padding: 18px 16px 28px; font-size: var(--fs-sm); color: var(--text-muted); }
+  footer a { font-weight: 700; }
+  [hidden] { display: none !important; }
+
+  @media print {
+    body { background: #fff; display: block; }
+    .actions, .tips, footer, .banner--info { display: none !important; }
+    .ticket { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    main { margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+<header class="top lava">
+  <a href="/" aria-label="Babierland City, accueil"><img src="/assets/logos/babierland-city.webp" alt="Babierland City" width="86" height="64"></a>
+</header>
+
+<main id="contenu" aria-live="polite">
+  <p class="center" id="loading">Chargement de ton billet…</p>
+
+  <div class="banner banner--danger" id="err" hidden><i data-lucide="circle-alert"></i><span id="errMsg"></span></div>
+
+  <div id="ok" hidden>
+    <div class="banner banner--danger" id="annule" hidden style="margin-bottom:18px"><i data-lucide="ban"></i><span>Ce billet a été <strong>annulé</strong>. Il ne permet pas d’entrer. Contacte l’équipe si c’est une erreur.</span></div>
+    <div class="banner banner--info" id="entre" hidden style="margin-bottom:18px"><i data-lucide="circle-check"></i><span id="entreMsg"></span></div>
+
+    <article class="ticket" id="ticket" aria-labelledby="tkPass">
+      <div class="ticket__head">
+        <h1 class="ticket__pass" id="tkPass">Pass Solo</h1>
+        <div class="ticket__who" id="tkWho"></div>
+        <div class="ticket__meta">
+          <span>Vendredi 1er janvier 2027 · 20h</span>
+          <span>Terrain de Marco (Amakpétabois), Adzopé</span>
+        </div>
+      </div>
+      <div class="ticket__stub">
+        <div class="qr" id="qr" role="img" aria-label="QR code du billet"></div>
+        <span class="numero" id="tkNum"></span>
+        <span class="code" id="tkCode"></span>
+      </div>
+    </article>
+
+    <div class="actions" style="margin-top:18px">
+      <a class="btn" id="dl" download><i data-lucide="download"></i>Télécharger le QR</a>
+      <button type="button" class="btn btn--ghost" onclick="window.print()"><i data-lucide="printer"></i>Imprimer</button>
+    </div>
+
+    <ul class="tips" style="margin-top:18px">
+      <li>Présente ce QR code à l’entrée (écran ou papier). Luminosité au maximum, ça va plus vite.</li>
+      <li>Ne le partage pas : <strong>il n’est valable qu’une seule fois</strong>. La première personne scannée entre.</li>
+      <li id="tipDuo" hidden>Pass Duo : venez ensemble, un seul scan fait entrer les 2 personnes.</li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  Une question ? <a href="https://wa.me/2250172024010" target="_blank" rel="noopener">WhatsApp 01 72 02 40 10</a> · <a href="/">Babierland City</a><br>
+  <a href="/conditions">Conditions de vente</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/mentions-legales">Mentions légales</a>
+</footer>
+
+<script src="/vendor/lucide.min.js"></script>
+<script>
+  const icons = () => window.lucide && lucide.createIcons({ attrs: { 'stroke-width': 2.25, 'aria-hidden': 'true' } });
+  const $ = id => document.getElementById(id);
+  const code = decodeURIComponent(location.pathname.split('/t/')[1] || new URLSearchParams(location.search).get('code') || '');
+  const heure = d => new Date(d).toLocaleString('fr-FR', { timeZone: 'Africa/Abidjan', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
+  function erreur(msg) {
+    $('loading').hidden = true;
+    $('errMsg').textContent = msg;
+    $('err').hidden = false;
+    icons();
+  }
+
+  async function charger() {
+    if (!code) return erreur('Lien incomplet : ouvre le lien reçu sur WhatsApp ou par e-mail.');
+    let r;
+    try {
+      r = await fetch('/api/billet?code=' + encodeURIComponent(code));
+    } catch {
+      return erreur('Pas de connexion. Réessaie dans un instant.');
+    }
+    const b = await r.json().catch(() => ({}));
+    if (!r.ok) return erreur(b.message || 'Billet introuvable.');
+
+    const duo = b.pass === 'duo';
+    document.title = `${b.numero} · Babierland City`;
+    $('ticket').classList.toggle('duo', duo);
+    $('ticket').classList.toggle('void', b.statut === 'annule');
+    $('tkPass').textContent = duo ? 'Pass Duo' : 'Pass Solo';
+    $('tkWho').textContent = b.titulaire + (duo && b.nom_duo ? ' + ' + b.nom_duo : '');
+    $('tkNum').textContent = b.numero;
+    $('tkCode').textContent = b.code;
+    $('qr').innerHTML = b.qr_svg; // SVG généré par le serveur à partir de l'URL du billet
+    $('dl').href = '/api/qr?code=' + encodeURIComponent(b.code);
+    $('dl').setAttribute('download', `babierland-city-${b.numero}.png`);
+    $('tipDuo').hidden = !duo;
+    $('annule').hidden = b.statut !== 'annule';
+    if (b.entre_le && b.statut !== 'annule') {
+      $('entreMsg').textContent = `Billet utilisé : entrée validée le ${heure(b.entre_le)}. Bonne soirée !`;
+      $('entre').hidden = false;
+    }
+    $('loading').hidden = true;
+    $('ok').hidden = false;
+    icons();
+  }
+  charger();
+</script>
+</body>
+</html>
