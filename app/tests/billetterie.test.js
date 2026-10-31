@@ -1,6 +1,6 @@
 import { test, beforeEach, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { viderBase, acheteur, query, closePool } from './helpers.js';
+import { viderBase, acheteur, codeTest, query, closePool } from './helpers.js';
 
 const B = await import('../api/_lib/billetterie.js');
 
@@ -30,20 +30,20 @@ test('une réservation du site reste en attente, sans billet', async () => {
   assert.equal(billet, null);
 });
 
-test('confirmer émet un billet numéroté avec un code unique, et reste idempotent', async () => {
+test('confirmer attribue le prochain ticket en ligne du registre, et reste idempotent', async () => {
   const solo = (await B.creerCommande(acheteur())).commande;
   const duo = (await B.creerCommande(acheteur({ pass: 'duo', nom_duo: 'Yao' }))).commande;
   const r1 = await B.confirmerCommande(solo.ref, { vendeur: 'Estelle', operateur: 'Wave' });
   const r2 = await B.confirmerCommande(duo.ref);
   assert.equal(r1.billet.numero, 'S001');
   assert.equal(r2.billet.numero, 'D001');
-  assert.match(r1.billet.code, /^S001(-[A-Z2-9]{4}){3}$/);
-  assert.notEqual(r1.billet.code, r2.billet.code);
+  assert.equal(r1.billet.code, codeTest('S001')); // le code imprimé du registre, pas un code généré
+  assert.equal(r2.billet.code, codeTest('D001'));
 
   const encore = await B.confirmerCommande(solo.ref);
   assert.equal(encore.deja, true);
   assert.equal(encore.billet.code, r1.billet.code);
-  const { rows } = await query('SELECT count(*)::int AS n FROM billets');
+  const { rows } = await query('SELECT count(*)::int AS n FROM billets WHERE commande_id IS NOT NULL');
   assert.equal(rows[0].n, 2);
 });
 
@@ -111,4 +111,54 @@ test('la recherche admin trouve par nom, téléphone ou numéro de billet', asyn
   assert.equal((await B.listerCommandes({ q: '505050505' })).length, 1);
   assert.equal((await B.listerCommandes({ q: 'S001' })).length, 1);
   assert.equal((await B.listerCommandes({ statut: 'en_attente' })).length, 1);
+});
+
+test('le stock en ligne est limité aux tickets du registre, par pass', async () => {
+  await query("DELETE FROM billets WHERE canal = 'en_ligne' AND pass = 'duo' AND numero <> 'D001'");
+  assert.equal((await B.stockEnLigne()).duo.restants, 1);
+  await B.creerCommande(acheteur({ pass: 'duo', nom_duo: 'A' }));
+  assert.equal((await B.stockEnLigne()).duo.restants, 0);
+  await assert.rejects(B.creerCommande(acheteur({ pass: 'duo', nom_duo: 'B' })), e => e.code === 'complet' && /Pass Duo/.test(e.message));
+  await B.creerCommande(acheteur()); // le Solo reste ouvert
+});
+
+test('un ticket physique entre sans commande ; un ticket en ligne non attribué est refusé', async () => {
+  const phys = await B.controlerBillet(codeTest('S101'), 'Porte A');
+  assert.equal(phys.resultat, 'ok');
+  assert.equal(phys.billet.canal, 'physique');
+  assert.equal((await B.controlerBillet(codeTest('S101'))).resultat, 'deja_entre');
+  assert.equal((await B.controlerBillet(codeTest('S002'))).resultat, 'non_vendu');
+  // réservé mais pas encore payé : toujours refusé
+  await B.creerCommande(acheteur());
+  assert.equal((await B.controlerBillet(codeTest('S001'))).resultat, 'non_vendu');
+  const s = await B.statistiques();
+  assert.equal(s.personnes_entrees, 1);
+  assert.equal(s.entrees_physiques, 1);
+});
+
+test('annuler un ticket physique le fait refuser à l’entrée', async () => {
+  await B.annulerBillet('d101');
+  assert.equal((await B.controlerBillet(codeTest('D101'))).resultat, 'annule');
+  await assert.rejects(B.annulerBillet('D101'), e => e.code === 'deja_annule');
+  await assert.rejects(B.annulerBillet('X999'), e => e.code === 'introuvable');
+});
+
+test('un ticket en ligne annulé n’est jamais attribué', async () => {
+  await B.annulerBillet('S001');
+  const { commande } = await B.creerCommande(acheteur());
+  assert.equal((await B.confirmerCommande(commande.ref)).billet.numero, 'S002');
+});
+
+test('le suivi exige le jeton et ne montre le billet qu’une fois payé', async () => {
+  const { commande } = await B.creerCommande(acheteur());
+  assert.match(commande.jeton, /^[A-Z2-9]{16}$/);
+  await assert.rejects(B.statutCommande(commande.ref, 'MAUVAISJETON1234'), e => e.status === 404);
+  await assert.rejects(B.statutCommande(commande.ref, ''), e => e.status === 404);
+  const avant = await B.statutCommande(commande.ref, commande.jeton.toLowerCase());
+  assert.equal(avant.statut, 'en_attente');
+  assert.equal(avant.billet_code, null);
+  await B.confirmerCommande(commande.ref);
+  const apres = await B.statutCommande(commande.ref, commande.jeton);
+  assert.equal(apres.billet_code, codeTest('S001'));
+  assert.equal(apres.billet_numero, 'S001');
 });

@@ -25,3 +25,7 @@
 ## [2026-10-12] deploy | Webhook GeniusPay sandbox créé via API REST (MCP geniuspay KO : SSE servi en application/json), secret en env Vercel ; paiement test BC-WUYG7J réussi de bout en bout (webhook signé → billet S001 émis). Le compte GeniusPay envoie TOUS ses événements à TOUS ses webhooks (partagé avec Kawari). Billet test à annuler.
 ## [2026-10-12] build | Webhook paiement : réf. hors BC- (autres projets du compte GeniusPay partagé) acquittées 200 et ignorées ; 45 tests OK ; vérifié en prod
 ## [2026-10-12] maintenance | Billet test annulé puis commande supprimée en prod, séquences S/D remises à zéro (prochain billet S001/D001) ; ADMIN_KEY prod régénérée ; vault mis à jour (deploiement, questions-ouvertes #3b ✅ #19, application-billetterie, index)
+## [2026-10-31] build | Paiement en ligne retiré ; tickets du PDF de l'équipe ; suivi client ; WhatsApp ouvert à la validation
+- GeniusPay/Kadev supprimés. Réservation → message WhatsApp pré-rempli → l'équipe valide « Paiement reçu » → ticket du registre attribué (S001-S100/D001-D100) + WhatsApp ouvert automatiquement vers l'acheteur ; l'acheteur voit son billet sur `/reservation` (lien à jeton).
+- `scripts/importer-tickets.js` charge les 500 tickets du PDF (500/500 QR = registre) ; QR imprimés stockés pour les 200 en ligne, aucun QR généré. Scanner : accepte `#v=<code>` (QR papier), refuse les tickets en ligne non vendus ; « Annuler un ticket » pour un papier perdu.
+- 33 tests OK + parcours complet vérifié au navigateur (base de test, vrais tickets). CGV/confidentialité version 2026-10-31.

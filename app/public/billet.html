@@ -24,7 +24,7 @@
   .ticket__stub { position: relative; background: var(--or-solo); color: var(--encre); padding: 24px 22px 20px; display: grid; justify-items: center; gap: 10px; border-top: 3px dashed rgba(27,18,16,.6); }
   .ticket.duo .ticket__stub { background: var(--citron); }
   .qr { background: #fff; padding: 10px; border-radius: var(--r-md); border: 2.5px solid var(--encre); width: min(260px, 100%); aspect-ratio: 1; }
-  .qr svg { display: block; width: 100%; height: 100%; }
+  .qr img { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
   .numero { font: 400 2rem/1 var(--font-display); letter-spacing: .04em; }
   .code { font: 700 var(--fs-sm) ui-monospace, monospace; letter-spacing: .06em; overflow-wrap: anywhere; text-align: center; }
   .ticket.void .qr { opacity: .25; }
@@ -74,7 +74,7 @@
         </div>
       </div>
       <div class="ticket__stub">
-        <div class="qr" id="qr" role="img" aria-label="QR code du billet"></div>
+        <div class="qr" id="qr"></div>
         <span class="numero" id="tkNum"></span>
         <span class="code" id="tkCode"></span>
       </div>
@@ -131,8 +131,11 @@
     $('tkWho').textContent = b.titulaire + (duo && b.nom_duo ? ' + ' + b.nom_duo : '');
     $('tkNum').textContent = b.numero;
     $('tkCode').textContent = b.code;
-    $('qr').innerHTML = b.qr_svg; // SVG généré par le serveur à partir de l'URL du billet
-    $('dl').href = '/api/qr?code=' + encodeURIComponent(b.code);
+    // QR imprimé du registre de l'équipe (image extraite du PDF des tickets).
+    const img = new Image();
+    img.src = b.qr_url; img.alt = `QR code du billet ${b.numero}`; img.width = img.height = 240;
+    $('qr').replaceChildren(img);
+    $('dl').href = b.qr_url;
     $('dl').setAttribute('download', `babierland-city-${b.numero}.png`);
     $('tipDuo').hidden = !duo;
     $('annule').hidden = b.statut !== 'annule';

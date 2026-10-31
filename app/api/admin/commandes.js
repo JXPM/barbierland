@@ -1,12 +1,12 @@
 import {
-  annulerCommande, anonymiserCommande, confirmerCommande, creerCommande, desabonner, donneesPersonne, journaliser,
+  annulerBillet, annulerCommande, anonymiserCommande, confirmerCommande, creerCommande, desabonner, donneesPersonne, journaliser,
   listerCommandes, statistiques,
 } from '../_lib/billetterie.js';
 import { acteurDe, exigerCle, handler, params, readJson, send, urlPublique, HttpError } from '../_lib/http.js';
 
 // Équipe (code ADMIN_KEY).
 // GET ?q=&statut=  → statistiques + commandes
-// POST { action: 'confirmer' | 'annuler' | 'vendre' | 'anonymiser' | 'donnees' | 'desabonner', … }
+// POST { action: 'confirmer' | 'annuler' | 'annuler_billet' | 'vendre' | 'anonymiser' | 'donnees' | 'desabonner', … }
 // En-tête x-acteur : prénom de la personne connectée (journal des opérations).
 export default handler(['GET', 'POST'], async (req, res) => {
   exigerCle(req, 'ADMIN_KEY');
@@ -35,6 +35,11 @@ export default handler(['GET', 'POST'], async (req, res) => {
     case 'annuler': {
       const r = await annulerCommande(ref, { note: String(body.note ?? '').trim().slice(0, 200) || null });
       await journaliser(acteur, 'annuler', ref);
+      return send(res, 200, r);
+    }
+    case 'annuler_billet': {
+      const r = await annulerBillet(body.numero);
+      await journaliser(acteur, 'annuler_billet', r.numero, { canal: r.canal });
       return send(res, 200, r);
     }
     case 'vendre': {

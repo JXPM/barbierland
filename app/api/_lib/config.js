@@ -1,7 +1,7 @@
 // Constantes de l'événement. Source : wiki/concepts/billetterie.md
 export const PASS = {
-  solo: { label: 'Pass Solo', prix: 6000, personnes: 1, prefixe: 'S', sequence: 'seq_billet_solo' },
-  duo: { label: 'Pass Duo', prix: 10000, personnes: 2, prefixe: 'D', sequence: 'seq_billet_duo' },
+  solo: { label: 'Pass Solo', prix: 6000, personnes: 1 },
+  duo: { label: 'Pass Duo', prix: 10000, personnes: 2 },
 };
 
 export const JAUGE = Number(process.env.JAUGE || 300);
@@ -18,7 +18,7 @@ export const WHATSAPP_OFFICIEL = '2250172024010';
 // ---------- Conformité ----------
 // Version des conditions de vente + politique de confidentialité affichées sur le site.
 // À incrémenter à chaque modification de public/conditions.html ou public/confidentialite.html.
-export const CGV_VERSION = '2026-10-11';
+export const CGV_VERSION = '2026-10-31';
 
 // Durées de conservation (annoncées dans public/confidentialite.html : les garder alignées).
 export const CONSERVATION = {

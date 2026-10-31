@@ -389,7 +389,8 @@
     <div class="wrap">
       <span class="eyebrow">Inscription</span>
       <h2 id="t-reg" class="display">Réserve ta place en 3 étapes</h2>
-      <p class="lead">Ça prend 2 minutes. Dès que ton paiement est validé, ton billet avec QR code arrive sur WhatsApp.</p>
+      <p class="lead">Ça prend 2 minutes. Dès que ton paiement est validé, ton billet avec QR code s'affiche sur ta page de suivi et arrive sur WhatsApp.</p>
+      <p id="dejaResa" hidden><a class="btn btn--ghost" id="dejaResaLien" href="#"><i data-lucide="ticket"></i>Déjà réservé ? Voir ma réservation</a></p>
 
       <form class="card" id="regForm" novalidate>
         <div class="hp" aria-hidden="true"><label>Ne pas remplir <input name="site_web" tabindex="-1" autocomplete="off"></label></div>
@@ -460,9 +461,9 @@
           <h3 class="display" style="font-size:2.2rem;margin:0">Place réservée&nbsp;!</h3>
           <p style="margin:0">Ta référence : <strong class="serial" id="okRef" style="font-size:1.1rem">BC-XXXXXX</strong></p>
           <div class="summary" style="width:100%;max-width:440px;margin:0"><span id="okLabel">Pass Solo · 1 personne</span><b id="okPrice">6 000 F</b></div>
-          <p style="margin:0;max-width:46ch" id="okTexte">Dernière étape : <strong>confirme sur WhatsApp</strong>. L'équipe te dit comment payer et, dès réception, t'envoie ton billet avec ton QR code. Ta place est gardée 48 h.</p>
-          <button type="button" class="btn btn--primary btn--lg" id="okPay" hidden><i data-lucide="smartphone"></i>Payer maintenant en ligne</button>
-          <a class="btn btn--green btn--lg" id="okWa" href="#" target="_blank" rel="noopener"><i data-lucide="message-circle"></i>Confirmer sur WhatsApp</a>
+          <p style="margin:0;max-width:46ch" id="okTexte">Dernière étape : <strong>envoie le message sur WhatsApp</strong>. L'équipe te dit comment payer et, dès réception, ton billet avec son QR code <strong>apparaît sur ta page de suivi</strong> et t'est envoyé sur WhatsApp. Ta place est gardée 48 h.</p>
+          <a class="btn btn--green btn--lg" id="okWa" href="#" target="_blank" rel="noopener"><i data-lucide="message-circle"></i>Envoyer sur WhatsApp</a>
+          <a class="btn btn--primary" id="okSuivi" href="#"><i data-lucide="ticket"></i>Suivre ma réservation</a>
           <p class="ar" id="okAr"></p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
             <button type="button" class="btn btn--ghost" onclick="window.print()"><i data-lucide="printer"></i>Garder une copie</button>
@@ -523,7 +524,7 @@
       <span class="eyebrow">FAQ</span>
       <h2 id="t-faq" class="display">Questions fréquentes</h2>
       <div class="faq">
-        <details><summary>Comment je reçois mon ticket ?<i data-lucide="plus"></i></summary><p>Dès que ton paiement est validé, l'équipe t'envoie sur WhatsApp le lien de ton billet numéroté avec son QR code. Présente-le à l'entrée (écran ou papier). Chaque QR ne fonctionne qu'une fois.</p></details>
+        <details><summary>Comment je reçois mon ticket ?<i data-lucide="plus"></i></summary><p>Dès que l'équipe a validé ton paiement, ton billet numéroté avec son QR code s'affiche sur ta page de suivi (le lien « Suivre ma réservation ») et t'est envoyé sur WhatsApp. Présente-le à l'entrée (écran ou papier). Chaque QR ne fonctionne qu'une fois.</p></details>
         <details><summary>Le Pass Duo, c'est pour qui ?<i data-lucide="plus"></i></summary><p>Pour venir à deux. Un seul ticket, deux entrées. Indique simplement le nom de la deuxième personne à l'inscription.</p></details>
         <details><summary>Quels moyens de paiement ?<i data-lucide="plus"></i></summary><p>Wave, Orange Money, MTN MoMo et Moov Money. Après ta réservation, confirme sur WhatsApp : l'équipe t'indique comment payer.</p></details>
         <details><summary>Je peux me faire rembourser ?<i data-lucide="plus"></i></summary><p>Oui pendant 10 jours ouvrables après ton achat, tant que ton billet n'a pas servi (demande sur WhatsApp ou par e-mail). Si la soirée est annulée, tu es remboursé. Tous les cas sont dans les <a href="/conditions#remboursement">conditions de vente</a>.</p></details>
@@ -772,9 +773,10 @@
       document.getElementById('okLabel').textContent = PASS[d.pass].label;
       document.getElementById('okPrice').textContent = PASS[d.pass].price;
       document.getElementById('okWa').href = d.whatsapp;
+      document.getElementById('okSuivi').href = d.suivi;
+      // Retrouver sa réservation plus tard depuis ce téléphone (bandeau « Mon billet »).
+      try { localStorage.setItem('bc-suivi', d.suivi); } catch { /* navigation privée */ }
       $('okAr').textContent = `Accusé de réception : réservation ${d.ref} enregistrée le ${new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Abidjan' })} pour ${el.prenom.value.trim()} ${el.nom.value.trim()}. Conditions de vente acceptées (version ${d.cgv_version}).`;
-      derniere = { ref: d.ref, montant: d.montant, nom: `${el.prenom.value.trim()} ${el.nom.value.trim()}`, email: el.mail.value.trim(), tel: el.tel.value.trim() };
-      preparerPaiement();
       show(4); form.querySelector('[data-panel="4"]').focus();
       chargerStock();
     } catch {
@@ -787,67 +789,6 @@
   });
   prev.addEventListener('click', () => show(step - 1));
   document.getElementById('restart').addEventListener('click', () => { form.reset(); form.querySelectorAll('.invalid').forEach(f => f.classList.remove('invalid')); form.querySelector('[data-mineur]').hidden = true; show(1); });
-
-  // ---- Paiement en ligne ----
-  // Actif seulement si le serveur a les clés. Deux modes : 'redirect' (GeniusPay) ou 'client' (SDK Kadev).
-  // Sinon, on garde le parcours WhatsApp.
-  let paiement = { actif: false };
-  let derniere = null;
-  fetch('/api/paiement/config').then(r => r.json()).then(c => { paiement = c; }).catch(() => {});
-
-  function preparerPaiement() {
-    const bouton = $('okPay');
-    if (!paiement.actif) { bouton.hidden = true; return; }
-    bouton.hidden = false;
-    $('okTexte').innerHTML = 'Paie en ligne tout de suite (Wave, Orange Money, MTN, Moov) et reçois ton billet aussitôt. Tu peux aussi confirmer sur WhatsApp.';
-  }
-
-  const retourUrl = () => `${location.origin}/paiement-retour?ref=${encodeURIComponent(derniere.ref)}`;
-
-  function chargerSdk() {
-    return new Promise((resolve, reject) => {
-      if (window.KadevPay) return resolve();
-      const s = document.createElement('script');
-      s.src = paiement.sdk_url; s.async = true;
-      s.onload = resolve; s.onerror = () => reject(new Error('SDK indisponible'));
-      document.head.appendChild(s);
-    });
-  }
-
-  async function payerRedirection() {
-    // Le serveur crée la transaction chez le fournisseur et renvoie l'URL de paiement.
-    const r = await fetch('/api/paiement/initier', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: derniere.ref }),
-    });
-    const d = await r.json().catch(() => ({}));
-    if (d.deja_payee) { location.href = retourUrl(); return; }
-    if (!r.ok || !d.redirect_url) throw new Error(d.message || 'indisponible');
-    location.href = d.redirect_url; // page de paiement du fournisseur
-  }
-
-  async function payerSdk() {
-    await chargerSdk();
-    KadevPay.checkout({
-      public_key: paiement.public_key,
-      amount: derniere.montant, email: derniere.email, name: derniere.nom, phone: derniere.tel,
-      metadata: { ref: derniere.ref }, callback_url: retourUrl(),
-      onClose: () => { $('okPay').disabled = false; },
-      onSuccess: () => { location.href = retourUrl(); },
-    });
-  }
-
-  $('okPay').addEventListener('click', async () => {
-    if (!derniere) return;
-    const btn = $('okPay');
-    btn.disabled = true;
-    try {
-      if (paiement.mode === 'redirect') await payerRedirection();
-      else await payerSdk();
-    } catch {
-      btn.disabled = false;
-      alert('Le paiement en ligne est momentanément indisponible. Confirme sur WhatsApp, on s’occupe de toi.');
-    }
-  });
 
   // ---- Carte Google : seulement à la demande ----
   $('mapLoad').addEventListener('click', () => {
@@ -863,6 +804,12 @@
   }));
   show(1);
   chargerStock();
+  try {
+    const suivi = localStorage.getItem('bc-suivi');
+    if (suivi && new URL(suivi, location.origin).origin === location.origin) {
+      $('dejaResaLien').href = suivi; $('dejaResa').hidden = false;
+    }
+  } catch { /* stockage indisponible */ }
 </script>
 </body>
 </html>

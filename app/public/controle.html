@@ -120,7 +120,7 @@
     try {
       const d = await api();
       $('nEntres').textContent = d.personnes_entrees;
-      $('nSur').textContent = `entrés / ${d.attendues}`;
+      $('nSur').textContent = `entrés (dont ${d.entrees_physiques} avec ticket papier)`;
     } catch {}
   }
 
@@ -167,7 +167,9 @@
       return afficher('bad', `<i data-lucide="wifi-off"></i><h2>Pas de réseau</h2><small>${esc(err.message)}. Réessaie.</small>`);
     }
     const b = d.billet;
-    const qui = b ? `<div class="who">${esc(b.titulaire)}${b.nom_duo ? `<br>+ ${esc(b.nom_duo)}` : ''}</div>` : '';
+    const qui = !b ? '' : b.titulaire
+      ? `<div class="who">${esc(b.titulaire)}${b.nom_duo ? `<br>+ ${esc(b.nom_duo)}` : ''}</div>`
+      : '<div class="who">Ticket papier</div>';
     if (d.resultat === 'ok') {
       bip(true);
       afficher('ok', `<i data-lucide="circle-check"></i><h2>Entrée OK</h2>${qui}<span class="pers">${b.pass === 'duo' ? 'DUO · 2 PERSONNES' : 'SOLO · 1 PERSONNE'}</span><small>${esc(b.numero)}</small>`);
@@ -175,6 +177,9 @@
     } else if (d.resultat === 'deja_entre') {
       bip(false);
       afficher('warn', `<i data-lucide="triangle-alert"></i><h2>Déjà entré</h2>${qui}<small>${esc(b.numero)} · scanné à ${heure(b.entre_le)} (${esc(b.entre_par || '')})</small>`);
+    } else if (d.resultat === 'non_vendu') {
+      bip(false);
+      afficher('bad', `<i data-lucide="ban"></i><h2>Ticket non vendu</h2><small>${esc(b.numero)} · ticket en ligne jamais payé : ne pas laisser entrer, envoyer à l'équipe.</small>`);
     } else if (d.resultat === 'annule') {
       bip(false);
       afficher('bad', `<i data-lucide="ban"></i><h2>Billet annulé</h2>${qui}<small>${esc(b.numero)} · ne pas laisser entrer</small>`);

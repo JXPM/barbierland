@@ -11,10 +11,14 @@
     "sync-assets": "sh scripts/sync-assets.sh",
     "test": "node --env-file-if-exists=.env.test --test --test-concurrency=1 tests/*.test.js",
     "purger": "node --env-file-if-exists=.env scripts/purger.js",
-    "verifier-legal": "node scripts/verifier-legal.js"
+    "verifier-legal": "node scripts/verifier-legal.js",
+    "importer-tickets": "node --env-file-if-exists=.env scripts/importer-tickets.js"
   },
   "dependencies": {
-    "pg": "^8.13.1",
-    "qrcode": "^1.5.4"
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0"
   }
 }

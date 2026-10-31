@@ -1,6 +1,6 @@
 import { test, before, beforeEach, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { viderBase, acheteur, closePool } from './helpers.js';
+import { viderBase, acheteur, codeTest, QR_TEST, closePool } from './helpers.js';
 
 const { creerServeur } = await import('../scripts/dev-server.js');
 const { extraireCode } = await import('../api/controle.js');
@@ -30,7 +30,9 @@ const appel = async (chemin, { body, headers = {} } = {}) => {
   return { status: r.status, type, data: type.includes('json') ? await r.json() : Buffer.from(await r.arrayBuffer()) };
 };
 
-test('extraireCode accepte l’URL du QR ou le code brut', () => {
+test('extraireCode accepte le QR des tickets imprimés (#v=), le lien /t/ ou le code brut', () => {
+  assert.equal(extraireCode('https://claude.ai/artifact/AbC123#v=S042-ABCD-EFGH-JKLM'), 'S042-ABCD-EFGH-JKLM');
+  assert.equal(extraireCode('https://babierlandcity.netlify.app/#v=d150-abcd-efgh-jklm'), 'D150-ABCD-EFGH-JKLM');
   assert.equal(extraireCode('https://babierlandcity.com/t/S001-ABCD-EFGH-JKLM'), 'S001-ABCD-EFGH-JKLM');
   assert.equal(extraireCode(' s001-abcd-efgh-jklm '), 'S001-ABCD-EFGH-JKLM');
 });
@@ -41,6 +43,11 @@ test('parcours complet : réservation → confirmation admin → billet + QR →
   const resa = await appel('/api/commandes', { body: { ...acheteur({ pass: 'duo', nom_duo: 'Yao Marc' }), operateur: 'Wave' } });
   assert.equal(resa.status, 201);
   assert.match(resa.data.whatsapp, /^https:\/\/wa\.me\/2250172024010\?text=/);
+  const suivi = new URL(resa.data.suivi);
+  assert.equal(suivi.pathname, '/reservation');
+  const statut = q => appel(`/api/commande?ref=${resa.data.ref}&j=${q}`);
+  assert.equal((await statut('FAUX')).status, 404);
+  assert.equal((await statut(suivi.searchParams.get('j'))).data.statut, 'en_attente');
   assert.ok(decodeURIComponent(resa.data.whatsapp).includes(resa.data.ref));
   assert.equal((await appel('/api/stock')).data.restantes, 3);
 
@@ -48,16 +55,21 @@ test('parcours complet : réservation → confirmation admin → billet + QR →
   const conf = await appel('/api/admin/commandes', { headers: ADMIN, body: { action: 'confirmer', ref: resa.data.ref, vendeur: 'Estelle' } });
   assert.equal(conf.status, 200);
   const code = conf.data.billet.code;
+  assert.equal(code, codeTest('D001'));
+  assert.equal((await statut(suivi.searchParams.get('j'))).data.billet_code, code);
 
   const billet = await appel(`/api/billet?code=${code}`);
   assert.equal(billet.data.numero, 'D001');
   assert.equal(billet.data.titulaire, 'Awa Kouassi');
   assert.equal(billet.data.lien, `${base}/t/${code}`);
-  assert.match(billet.data.qr_svg, /^<svg/);
+  assert.equal(billet.data.qr_url, `/api/qr?code=${code}`);
 
   const png = await appel(`/api/qr?code=${code}`);
   assert.equal(png.type, 'image/png');
-  assert.equal(png.data.subarray(1, 4).toString(), 'PNG');
+  assert.ok(png.data.equals(QR_TEST), 'image du QR imprimé, telle que stockée');
+  // un ticket non attribué n'est pas consultable
+  assert.equal((await appel(`/api/billet?code=${codeTest('D002')}`)).status, 404);
+  assert.equal((await appel(`/api/qr?code=${codeTest('D002')}`)).status, 404);
 
   const page = await fetch(`${base}/t/${code}`);
   assert.equal(page.status, 200);
@@ -78,6 +90,21 @@ test('parcours complet : réservation → confirmation admin → billet + QR →
   const csv = (await appel('/api/admin/export', { headers: ADMIN })).data.toString('utf8');
   assert.ok(csv.startsWith('﻿N°;Type;Code secret'));
   assert.match(csv, /D001;Duo;/);
+});
+
+test('contrôle : QR imprimé (#v=) d’un ticket physique, ticket non vendu, ticket annulé', async () => {
+  const qr = n => `https://claude.ai/artifact/AxnbrJoVqp6JdH7CW1v4ho#v=${codeTest(n)}`;
+  const ok = await appel('/api/controle', { headers: ACCUEIL, body: { code: qr('D101'), poste: 'Porte 2' } });
+  assert.equal(ok.data.resultat, 'ok');
+  assert.equal(ok.data.billet.canal, 'physique');
+  assert.equal(ok.data.billet.personnes, 2);
+  assert.equal(ok.data.billet.titulaire, null);
+  assert.equal((await appel('/api/controle', { headers: ACCUEIL, body: { code: qr('S003') } })).data.resultat, 'non_vendu');
+
+  const an = await appel('/api/admin/commandes', { headers: ADMIN, body: { action: 'annuler_billet', numero: 'S101' } });
+  assert.equal(an.status, 200);
+  assert.equal((await appel('/api/controle', { headers: ACCUEIL, body: { code: qr('S101') } })).data.resultat, 'annule');
+  assert.equal((await appel('/api/controle', { headers: ACCUEIL })).data.entrees_physiques, 2);
 });
 
 test('erreurs de validation renvoyées champ par champ', async () => {

@@ -105,6 +105,7 @@
       <img src="/assets/logos/babierland-city.webp" alt="" width="54" height="40">
       <h1>Billetterie</h1>
       <button class="btn" type="button" id="btnVente"><i data-lucide="plus"></i>Vente guichet</button>
+      <button class="btn btn--ghost" type="button" id="btnAnnulerTicket" aria-label="Annuler un ticket (perdu, volé…)"><i data-lucide="ticket-x"></i><span class="lbl">Annuler un ticket</span></button>
       <button class="btn btn--ghost" type="button" id="btnExport"><i data-lucide="file-spreadsheet"></i><span class="lbl">Export</span></button>
       <button class="btn btn--ghost" type="button" id="btnPrive" aria-label="Vie privée et données personnelles"><i data-lucide="shield-check"></i><span class="lbl">Vie privée</span></button>
       <button class="btn btn--ghost" type="button" id="btnQuit" aria-label="Se déconnecter"><i data-lucide="log-out"></i></button>
@@ -115,8 +116,8 @@
     <section class="kpis" aria-label="Chiffres clés">
       <div class="kpi kpi--main"><span>Places payées</span><b id="kPayees">0</b><small id="kJauge">/ 300</small></div>
       <div class="kpi"><span>En attente</span><b id="kAttente">0</b><small id="kReservees">0 places bloquées</small></div>
-      <div class="kpi"><span>Pass Solo</span><b id="kSolo">0</b><small>vendus</small></div>
-      <div class="kpi"><span>Pass Duo</span><b id="kDuo">0</b><small>vendus</small></div>
+      <div class="kpi"><span>Pass Solo</span><b id="kSolo">0</b><small id="kSoloStock">vendus</small></div>
+      <div class="kpi"><span>Pass Duo</span><b id="kDuo">0</b><small id="kDuoStock">vendus</small></div>
       <div class="kpi"><span>Recette</span><b id="kRecette">0 F</b><small>encaissée</small></div>
       <div class="kpi"><span>Entrées</span><b id="kEntrees">0</b><small id="kEntreesSur">personnes</small></div>
     </section>
@@ -263,6 +264,8 @@
     $('kReservees').textContent = `${s.reservees} place${s.reservees > 1 ? 's' : ''} bloquée${s.reservees > 1 ? 's' : ''}`;
     $('kSolo').textContent = s.solo;
     $('kDuo').textContent = s.duo;
+    $('kSoloStock').textContent = `vendus · ${s.stock.solo.libres} tickets en ligne libres`;
+    $('kDuoStock').textContent = `vendus · ${s.stock.duo.libres} tickets en ligne libres`;
     $('kRecette').textContent = fcfa(s.recette);
     $('kEntrees').textContent = s.personnes_entrees;
     $('kEntreesSur').textContent = `sur ${s.payees} attendues`;
@@ -378,20 +381,33 @@
     if (!$('cVendeur').value.trim()) { $('cVendeur').focus(); return; }
     store.set('bc-vendeur', $('cVendeur').value.trim(), localStorage);
     $('confOk').disabled = true; $('confErr').hidden = true;
+    // Onglet ouvert pendant le clic (sinon bloqué) : il bascule sur WhatsApp, billet pré-rempli, dès l'émission.
+    const fenetreWa = window.open('', '_blank');
     try {
       const r = await api('/api/admin/commandes', { action: 'confirmer', ref: enCours.ref, vendeur: $('cVendeur').value, operateur: $('cOp').value, paiement_ref: $('cRef').value });
       const c = { ...enCours, ...r.commande, numero: r.billet.numero, code: r.billet.code };
+      if (fenetreWa) fenetreWa.location.href = waBillet(c);
       $('confFields').hidden = true; $('confOk').hidden = true;
-      $('confDone').innerHTML = `<strong>Billet ${esc(c.numero)} émis ✓</strong>
-        <a class="btn btn--green" href="${esc(waBillet(c))}" target="_blank" rel="noopener"><i data-lucide="send"></i>Envoyer le billet sur WhatsApp</a>
+      $('confDone').innerHTML = `<strong>Billet ${esc(c.numero)} attribué ✓</strong>
+        <span>${fenetreWa ? 'WhatsApp s’est ouvert avec le billet : appuie sur Envoyer.' : 'Envoie-lui le billet :'} Il le voit aussi sur sa page de suivi.</span>
+        <a class="btn btn--green" href="${esc(waBillet(c))}" target="_blank" rel="noopener"><i data-lucide="send"></i>${fenetreWa ? 'Rouvrir WhatsApp' : 'Envoyer le billet sur WhatsApp'}</a>
         <a href="${esc(lienBillet(c))}" target="_blank" rel="noopener">Voir le billet</a>`;
       $('confDone').hidden = false; icons();
       charger();
     } catch (err) {
+      if (fenetreWa) fenetreWa.close();
       if (err.message !== '401') { $('confErr').textContent = err.message; $('confErr').hidden = false; }
     } finally { $('confOk').disabled = false; }
   });
 
+  // ---------- Annuler un ticket (papier perdu ou volé, ticket en ligne à retirer) ----------
+  $('btnAnnulerTicket').addEventListener('click', async () => {
+    const numero = prompt('N° du ticket à annuler (ex. S142, D201) ?\nIl sera refusé à l’entrée. Pour une réservation du site, utilise plutôt « Annuler » sur la commande.');
+    if (!numero || !numero.trim()) return;
+    if (!confirm(`Annuler définitivement le ticket ${numero.trim().toUpperCase()} ?`)) return;
+    try { const r = await api('/api/admin/commandes', { action: 'annuler_billet', numero }); toast(`Ticket ${r.numero} annulé`); charger(); }
+    catch (err) { if (err.message !== '401') toast(err.message); }
+  });
   // ---------- Vente au guichet ----------
   const fv = $('formVente');
   $('btnVente').addEventListener('click', () => {

@@ -23,26 +23,26 @@ n'est pas branché** : il viendra quand la passerelle sera choisie ([[idees-bill
 
 **Teaser** : le bouton « Voir le teaser » du hero ouvre la vidéo verticale 9:16 (`site/assets/visuels/teaser-9x16.mp4`, source immuable dans `raw/`), lecture en lightbox, muette, avec un CTA « Réserver ».
 
-## Parcours
-1. **Réservation (site)** : pass → infos → moyen de paiement prévu → commande `en attente` (réf. `BC-XXXXXX`), place bloquée **48 h**.
-2. L'acheteur clique **« Confirmer sur WhatsApp »** : message pré-rempli vers le numéro officiel 01 72 02 40 10.
-3. L'équipe reçoit le paiement puis clique **« Paiement reçu »** dans `/admin` : le billet est **émis** (n° `S001`/`D001`, code secret, QR unique).
-4. Bouton **« Envoyer le billet »** : ouvre WhatsApp vers l'acheteur avec le lien `/t/<code>` (envoi manuel, cf. [[idees-billetterie]] § 2).
-5. **Entrée** : `/controle` scanne le QR → entrée validée **une seule fois** (même si 2 portes scannent en même temps). Un Duo fait entrer 2 personnes.
+## Parcours (depuis le 2026-10-31 : plus de paiement en ligne)
+1. **Réservation (site)** : pass → infos → moyen de paiement prévu → commande `en attente` (réf. `BC-XXXXXX` + **jeton de suivi**), place bloquée **48 h**.
+2. L'acheteur clique **« Envoyer sur WhatsApp »** : message pré-rempli vers le numéro officiel 01 72 02 40 10. Il garde le lien **« Suivre ma réservation »** (`/reservation?ref=…&j=…`, aussi mémorisé sur son téléphone).
+3. L'équipe reçoit le mobile money puis clique **« Paiement reçu »** dans `/admin` : le **prochain ticket en ligne du registre** est attribué (S001→S100 / D001→D100, dans l'ordre) **et WhatsApp s'ouvre tout seul** vers l'acheteur avec le lien du billet : il reste à appuyer sur Envoyer.
+4. Côté acheteur, la page de suivi (rafraîchie toutes les 10 s) affiche **« Paiement reçu ! Voir mon billet »** → `/t/<code>` montre le **QR imprimé du PDF**.
+5. **Entrée** : `/controle` scanne **tous** les tickets (en ligne et papier) → entrée validée **une seule fois**. Un Duo fait entrer 2 personnes.
 
-Vente sur place : **« Vente guichet »** dans `/admin` (espèces ou mobile money) émet le billet tout de suite.
+Vente sur place via `/admin` (« Vente guichet ») : attribue aussi un ticket en ligne. Les tickets papier (S101-S250, D101-D250) se vendent hors appli et n'ont rien à saisir ; un ticket papier perdu/volé s'invalide avec **« Annuler un ticket »** (n°).
 
-## Billets & QR
-- **Un QR différent par billet**, généré par le serveur. Il encode `https://<domaine>/t/<code secret>`.
-- Code secret au même format que le registre : `S001-XXXX-XXXX-XXXX` (alphabet sans 0/O/1/I, ~60 bits).
-- Numérotation séparée Solo (`S001…`) / Duo (`D001…`), attribuée **à la confirmation du paiement** (pas de trou pour les réservations abandonnées).
-- ⚠️ Les **500 QR existants** du registre (`raw/billetterie/`) **ne sont pas utilisés** : ils pointent vers un lien `claude.ai` ([[questions-ouvertes]] #10). L'appli génère les siens.
-- ⚠️ Le **domaine doit être fixé avant le premier billet émis** : il est imprimé dans chaque QR (`PUBLIC_URL`).
+## Billets & QR (registre de l'équipe)
+- Source : `raw/billetterie/BABIERLAND_QR_codes_tickets.pdf` (500 pages = 1 QR + son n°), chargé par `node scripts/importer-tickets.js <PDF>` (`--essai` = vérification sans écriture). 500/500 QR décodés = registre Excel (vérifié le 2026-10-31).
+- **Aucun QR n'est généré** : l'image du QR est découpée dans le PDF et stockée en base (`billets.qr_png`) pour les 200 tickets en ligne ; servie par `/api/qr?code=` (uniquement si le ticket est attribué).
+- Les QR encodent `https://claude.ai/artifact/…#v=<code secret>` ([[questions-ouvertes]] #10) : le scanner extrait le code après `#v=` (accepte aussi `/t/<code>` et le code brut). Le domaine n'est donc **plus** dans les QR : changer de domaine ne casse rien.
+- Au contrôle : ticket **papier** = valable (sauf annulé) ; ticket **en ligne non attribué ou non payé** = refusé « Ticket non vendu ».
 
 ## Règles métier
 | Règle | Valeur |
 |---|---|
-| Jauge | 300 personnes, Duo = 2 (`JAUGE`) |
+| Jauge | 300 personnes, Duo = 2 (`JAUGE`) — en pratique = stock en ligne (100 Solo + 100 Duo) |
+| Stock en ligne | par pass : tickets en ligne libres − réservations en attente (< 48 h) |
 | Réservation non payée | bloque sa place 48 h (`RESERVATION_HEURES`), puis la libère ; reste confirmable si la jauge le permet |
 | Confirmation | refusée si elle ferait dépasser 300 personnes **payées** |
 | Annulation | invalide le billet (refusé à l'entrée) |
@@ -55,22 +55,15 @@ Vente sur place : **« Vente guichet »** dans `/admin` (espèces ou mobile mone
 - Design : `site/assets/` copié par `npm run sync-assets` ([[charte-graphique]]).
 - Tests : 16 tests (`npm test`, Postgres local) + parcours vérifié au navigateur le 2026-10-11 (réservation → paiement reçu → billet → QR décodé → entrée → « déjà entré »).
 
-## Paiement en ligne — **GeniusPay** (défaut), Kadev en secours
-Adaptateur `app/api/_lib/paiement.js` — générique : deux fournisseurs implémentés, bascule par `PAIEMENT_FOURNISSEUR`.
-- **GeniusPay** (mode *redirection*, choisi le 2026-10-11) : réservation → bouton « Payer en ligne » → `POST /api/paiement/initier` crée la transaction (API marchand) et renvoie l'URL de checkout → l'acheteur paie sur GeniusPay → **webhook** `/api/paiement/geniuspay` → émission du billet → retour `/paiement-retour` qui l'affiche. Avantage : **aucun script tiers** (CSP stricte conservée).
-- **Kadev Pay** (mode *SDK client*) : conservé en secours (`/api/paiement/kadev`).
-- **Sécurité (fail-closed)**, identique pour les deux : billet émis seulement si **signature du webhook valide** (GeniusPay : HMAC-SHA256 de `timestamp + "." + corps`, fenêtre 5 min ; Kadev : HMAC-SHA512 du corps) ET **transaction re-vérifiée via l'API du fournisseur** ET **montant ≥ attendu**. Idempotent, journalisé.
-- **Inactif par défaut** : s'active quand les clés du fournisseur choisi sont définies ; sinon seul le parcours WhatsApp reste.
-- Endpoints : `/api/paiement/config` (état), `/api/paiement/initier` (POST, mode redirection), `/api/paiement/geniuspay` & `/api/paiement/kadev` (webhooks), `/api/commande?ref=` (statut pour la page de retour).
-- Réf. hors `BC-` (autres projets du compte marchand partagé) : acquittées 200 et ignorées (`{ignore:'hors_babierland'}`).
-- Tests : 10 GeniusPay + 8 Kadev (API fournisseur simulée). **45 tests au total.**
+## Paiement
+Mobile money envoyé directement à l'équipe, **validé à la main** dans `/admin`. GeniusPay/Kadev **retirés le 2026-10-31** (code, tests, page `/paiement-retour` → redirigée vers l'accueil). Tests : **33** (`npm test`).
 
 ## Reste à faire
 - [x] Clés **SANDBOX GeniusPay** + webhook déclaré + paiement test réel validé (2026-10-12) → [[deploiement]]
-- [ ] Compte marchand dédié puis clés `pk_live_`/`sk_live_` + webhook live
+- [ ] Supprimer le webhook GeniusPay 5768 et les variables `GENIUSPAY_*`/`KADEV_*` sur Vercel (inutiles)
 - [x] Base Neon + projet Vercel, `PUBLIC_URL`, `ADMIN_KEY`, `CONTROLE_KEY` (2026-10-11) → [[deploiement]]
 - [ ] Nom de domaine définitif ([[questions-ouvertes]] #3)
 - [ ] Retirer `noindex` de la page d'accueil au lancement (après validation de Brou Yann)
-- [ ] Envoi automatique WhatsApp / e-mail (aujourd'hui : bouton manuel)
+- [ ] Envoi 100 % automatique WhatsApp (sans clic) : nécessite l'API WhatsApp Business (Meta) → [[idees-billetterie]]
 - [ ] **Conformité** : dossier ARTCI, identité légale, 22 champs `npm run verifier-legal` → [[conformite-legale]]
 - [x] Variable `CRON_SECRET` sur Vercel (purge quotidienne des données)

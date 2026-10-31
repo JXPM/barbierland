@@ -68,3 +68,20 @@ CREATE TABLE IF NOT EXISTS journal (
   details jsonb
 );
 CREATE INDEX IF NOT EXISTS journal_quand_idx ON journal (quand);
+
+-- ---------- Tickets du registre (PDF de l'équipe, 2026-10-31) ----------
+-- Les 500 tickets imprimés (S001-S250, D001-D250) sont chargés d'avance par scripts/importer-tickets.js.
+--   canal 'en_ligne' : S001-S100 et D001-D100, attribués aux réservations du site validées par l'équipe ;
+--                      leur QR (image extraite du PDF) est stocké dans qr_png et affiché sur /t/<code>.
+--   canal 'physique' : le reste, vendu en main propre ; valables à l'entrée sans commande associée.
+-- Un ticket en ligne non attribué (commande_id NULL) est refusé à l'entrée.
+ALTER TABLE billets ALTER COLUMN commande_id DROP NOT NULL;
+ALTER TABLE billets ADD COLUMN IF NOT EXISTS pass   text CHECK (pass IN ('solo', 'duo'));
+ALTER TABLE billets ADD COLUMN IF NOT EXISTS canal  text NOT NULL DEFAULT 'en_ligne' CHECK (canal IN ('en_ligne', 'physique'));
+ALTER TABLE billets ADD COLUMN IF NOT EXISTS qr_png bytea;
+UPDATE billets b SET pass = c.pass FROM commandes c WHERE c.id = b.commande_id AND b.pass IS NULL;
+CREATE INDEX IF NOT EXISTS billets_libres_idx ON billets (canal, pass, numero) WHERE commande_id IS NULL;
+
+-- Jeton du lien de suivi envoyé à l'acheteur (/reservation?ref=…&j=…) : la réf. seule ne suffit pas
+-- pour voir le billet.
+ALTER TABLE commandes ADD COLUMN IF NOT EXISTS jeton text;

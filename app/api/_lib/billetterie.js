@@ -1,5 +1,5 @@
 // Cœur métier : réservations, jauge, émission des billets, contrôle à l'entrée.
-// Toutes les écritures passent par ici (site, admin, et plus tard le webhook de paiement).
+// Toutes les écritures passent par ici (site et admin).
 import { randomInt } from 'node:crypto';
 import { PASS, JAUGE, RESERVATION_HEURES, OPERATEURS_GUICHET, CGV_VERSION, CONSERVATION } from './config.js';
 import { query, tx } from './db.js';
@@ -9,8 +9,8 @@ const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sans 0/O ni 1/I
 const aleatoire = n => Array.from({ length: n }, () => ALPHABET[randomInt(ALPHABET.length)]).join('');
 
 export const nouvelleRef = () => `BC-${aleatoire(6)}`;
-// Même format que le registre de l'équipe : n° + 3 blocs aléatoires (~60 bits).
-export const nouveauCode = numero => `${numero}-${aleatoire(4)}-${aleatoire(4)}-${aleatoire(4)}`;
+// Jeton du lien de suivi (~80 bits) : la réf. seule ne donne pas accès au billet.
+export const nouveauJeton = () => aleatoire(16);
 
 // Verrou applicatif : sérialise tout ce qui touche à la jauge.
 const VERROU_JAUGE = 2027_01_01;
@@ -73,6 +73,27 @@ export async function etatJauge(client = { query }) {
   return { jauge: JAUGE, payees: r.payees, reservees: r.reservees, occupees, restantes: Math.max(0, JAUGE - occupees) };
 }
 
+// Tickets en ligne encore libres par pass, moins les réservations en attente qui les attendent.
+const SQL_STOCK_EN_LIGNE = `
+  SELECT p.pass,
+    (SELECT COUNT(*) FROM billets b WHERE b.canal = 'en_ligne' AND b.pass = p.pass AND b.commande_id IS NULL
+       AND b.statut = 'valide')::int AS libres,
+    (SELECT COUNT(*) FROM commandes c WHERE c.pass = p.pass AND c.statut = 'en_attente'
+       AND c.cree_le > now() - make_interval(hours => $1))::int AS reserves
+  FROM (VALUES ('solo'), ('duo')) AS p(pass)`;
+
+export async function stockEnLigne(client = { query }) {
+  const { rows } = await client.query(SQL_STOCK_EN_LIGNE, [RESERVATION_HEURES]);
+  return Object.fromEntries(rows.map(r => [r.pass, { libres: r.libres, reserves: r.reserves, restants: Math.max(0, r.libres - r.reserves) }]));
+}
+
+function exigerTicket(stock, pass, { compterReserves }) {
+  const s = stock[pass];
+  if ((compterReserves ? s.restants : s.libres) < 1) {
+    throw new HttpError(409, 'complet', `Il n’y a plus de ${PASS[pass].label} disponible en ligne.`);
+  }
+}
+
 function exigerPlace(etat, personnes, { compterReservees }) {
   const prises = compterReservees ? etat.occupees : etat.payees;
   if (prises + personnes > JAUGE) {
@@ -92,12 +113,13 @@ export async function creerCommande(entree, { canal = 'site', vendeur = null, pa
   return tx(async client => {
     await client.query('SELECT pg_advisory_xact_lock($1)', [VERROU_JAUGE]);
     exigerPlace(await etatJauge(client), p.personnes, { compterReservees: true });
+    exigerTicket(await stockEnLigne(client), c.pass, { compterReserves: true });
     const { rows: [commande] } = await client.query(
       `INSERT INTO commandes (ref, pass, nom, prenom, telephone, email, nom_duo, montant, operateur, canal, vendeur,
-                              cgv_version, cgv_acceptees_le, mineur, optin_infos)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, now(), $13, $14) RETURNING *`,
+                              cgv_version, cgv_acceptees_le, mineur, optin_infos, jeton)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, now(), $13, $14, $15) RETURNING *`,
       [nouvelleRef(), c.pass, c.nom, c.prenom, c.telephone, c.email, c.nom_duo, p.prix, c.operateur, canal, vendeur,
-        CGV_VERSION, c.mineur, c.optin_infos]);
+        CGV_VERSION, c.mineur, c.optin_infos, nouveauJeton()]);
     if (c.optin_infos) {
       await client.query(
         `INSERT INTO abonnes (telephone, prenom, nom, email, source) VALUES ($1,$2,$3,$4,$5)
@@ -110,22 +132,24 @@ export async function creerCommande(entree, { canal = 'site', vendeur = null, pa
   });
 }
 
+// Attribue le prochain ticket en ligne libre du registre (S001…S100 / D001…D100, dans l'ordre).
 async function emettre(client, commande, { vendeur, operateur, paiementRef }) {
-  const p = PASS[commande.pass];
-  const { rows: [{ n }] } = await client.query(`SELECT nextval('${p.sequence}')::int AS n`);
-  const numero = `${p.prefixe}${String(n).padStart(3, '0')}`;
+  const { rows: [libre] } = await client.query(
+    `SELECT id FROM billets WHERE canal = 'en_ligne' AND pass = $1 AND commande_id IS NULL AND statut = 'valide'
+     ORDER BY numero LIMIT 1 FOR UPDATE SKIP LOCKED`, [commande.pass]);
+  if (!libre) throw new HttpError(409, 'plus_de_ticket', `Plus aucun ticket ${PASS[commande.pass].label} en ligne à attribuer.`);
   await client.query(
     `UPDATE commandes SET statut = 'payee', payee_le = now(),
        vendeur = COALESCE($2, vendeur), operateur = COALESCE($3, operateur), paiement_ref = COALESCE($4, paiement_ref)
      WHERE id = $1`, [commande.id, vendeur, operateur, paiementRef]);
   const { rows: [billet] } = await client.query(
-    'INSERT INTO billets (numero, code, commande_id) VALUES ($1,$2,$3) RETURNING *',
-    [numero, nouveauCode(numero), commande.id]);
+    `UPDATE billets SET commande_id = $2, statut = 'valide', cree_le = now() WHERE id = $1
+     RETURNING id, numero, code, pass, canal, statut, commande_id, cree_le`, [libre.id, commande.id]);
   return billet;
 }
 
-// Paiement reçu → émet le billet (et son QR). Idempotent : rappeler renvoie le même billet.
-// Point d'entrée unique pour l'admin aujourd'hui et le webhook de paiement demain.
+// Paiement reçu (validé par l'équipe dans /admin) → attribue un ticket du registre.
+// Idempotent : rappeler renvoie le même billet.
 export async function confirmerCommande(ref, { vendeur = null, operateur = null, paiementRef = null } = {}) {
   return tx(async client => {
     await client.query('SELECT pg_advisory_xact_lock($1)', [VERROU_JAUGE]);
@@ -133,10 +157,12 @@ export async function confirmerCommande(ref, { vendeur = null, operateur = null,
     if (!commande) throw new HttpError(404, 'introuvable', 'Commande introuvable.');
     if (commande.statut === 'annulee') throw new HttpError(409, 'annulee', 'Cette commande a été annulée.');
     if (commande.statut === 'payee') {
-      const { rows: [billet] } = await client.query('SELECT * FROM billets WHERE commande_id = $1', [commande.id]);
+      const { rows: [billet] } = await client.query(
+        'SELECT id, numero, code, pass, canal, statut, commande_id, cree_le FROM billets WHERE commande_id = $1', [commande.id]);
       return { commande, billet, deja: true };
     }
     exigerPlace(await etatJauge(client), PASS[commande.pass].personnes, { compterReservees: false });
+    exigerTicket(await stockEnLigne(client), commande.pass, { compterReserves: false });
     const billet = await emettre(client, commande, { vendeur, operateur, paiementRef });
     return { commande: { ...commande, statut: 'payee' }, billet, deja: false };
   });
@@ -162,11 +188,28 @@ export async function annulerCommande(ref, { note = null } = {}) {
 // ---------- Billets ----------
 
 const SQL_BILLET = `
-  SELECT b.numero, b.code, b.statut, b.entre_le, b.entre_par,
-         c.pass, c.nom, c.prenom, c.nom_duo, c.ref
-  FROM billets b JOIN commandes c ON c.id = b.commande_id`;
+  SELECT b.numero, b.code, b.statut, b.entre_le, b.entre_par, b.canal, b.pass, b.commande_id,
+         c.nom, c.prenom, c.nom_duo, c.ref, c.statut AS commande_statut
+  FROM billets b LEFT JOIN commandes c ON c.id = b.commande_id`;
 
 const normaliserCode = code => String(code ?? '').trim().toUpperCase();
+
+// Ticket utilisable : physique, ou en ligne attribué à une commande payée.
+const SQL_UTILISABLE = `(b.canal = 'physique' OR EXISTS (
+  SELECT 1 FROM commandes c WHERE c.id = b.commande_id AND c.statut = 'payee'))`;
+
+// Billet visible par son titulaire (/t/<code>) : uniquement s'il a été attribué à une commande.
+export async function trouverBilletAttribue(code) {
+  const b = await trouverBillet(code);
+  return b && b.commande_id ? b : null;
+}
+
+// Image du QR imprimé (extraite du PDF de l'équipe) d'un ticket attribué.
+export async function qrDuBillet(code) {
+  const { rows: [b] } = await query(
+    'SELECT numero, qr_png FROM billets WHERE code = $1 AND commande_id IS NOT NULL', [normaliserCode(code)]);
+  return b ?? null;
+}
 
 export async function trouverBillet(code) {
   const { rows: [b] } = await query(`${SQL_BILLET} WHERE b.code = $1`, [normaliserCode(code)]);
@@ -178,13 +221,44 @@ export async function trouverBillet(code) {
 export async function controlerBillet(code, poste = 'Entrée') {
   const c = normaliserCode(code);
   const { rows: [entre] } = await query(
-    `UPDATE billets SET entre_le = now(), entre_par = $2
-     WHERE code = $1 AND statut = 'valide' AND entre_le IS NULL RETURNING id`, [c, texte(poste, 40) || 'Entrée']);
+    `UPDATE billets b SET entre_le = now(), entre_par = $2
+     WHERE b.code = $1 AND b.statut = 'valide' AND b.entre_le IS NULL AND ${SQL_UTILISABLE} RETURNING id`,
+    [c, texte(poste, 40) || 'Entrée']);
   const billet = await trouverBillet(c);
   if (!billet) return { resultat: 'inconnu' };
   if (entre) return { resultat: 'ok', billet };
-  if (billet.statut === 'annule') return { resultat: 'annule', billet };
-  return { resultat: 'deja_entre', billet };
+  if (billet.statut === 'annule' || billet.commande_statut === 'annulee') return { resultat: 'annule', billet };
+  if (billet.entre_le) return { resultat: 'deja_entre', billet };
+  return { resultat: 'non_vendu', billet }; // ticket en ligne jamais attribué (ou commande non payée)
+}
+
+// Suivi public d'une réservation (/reservation?ref=…&j=…) : le lien du billet n'apparaît qu'une fois payé.
+export async function statutCommande(ref, jeton) {
+  const { rows: [c] } = await query(
+    `SELECT c.statut, c.pass, c.montant, c.prenom, c.jeton, b.code, b.numero
+     FROM commandes c LEFT JOIN billets b ON b.commande_id = c.id WHERE c.ref = $1`,
+    [String(ref || '').trim().toUpperCase()]);
+  const ok = c && c.jeton && String(jeton || '').trim().toUpperCase() === c.jeton;
+  if (!ok) throw new HttpError(404, 'introuvable', 'Réservation introuvable. Vérifie le lien reçu.');
+  const payee = c.statut === 'payee';
+  return {
+    statut: c.statut, pass: c.pass, montant: c.montant, prenom: c.prenom,
+    billet_code: payee ? c.code : null, billet_numero: payee ? c.numero : null,
+  };
+}
+
+// Invalide un ticket par son numéro (ex. ticket physique perdu ou volé) : refusé à l'entrée ensuite.
+export async function annulerBillet(numero) {
+  const n = String(numero ?? '').trim().toUpperCase();
+  const { rows: [b] } = await query(
+    `UPDATE billets SET statut = 'annule' WHERE numero = $1 AND statut = 'valide' RETURNING numero, canal, commande_id`, [n]);
+  if (!b) {
+    const { rowCount } = await query('SELECT 1 FROM billets WHERE numero = $1', [n]);
+    throw rowCount
+      ? new HttpError(409, 'deja_annule', `Le ticket ${n} est déjà annulé.`)
+      : new HttpError(404, 'introuvable', `Ticket ${n} introuvable (format attendu : S001, D150…).`);
+  }
+  return b;
 }
 
 // ---------- Admin ----------
@@ -199,10 +273,11 @@ export async function statistiques() {
       COALESCE(SUM(montant) FILTER (WHERE statut = 'payee'), 0)::int AS recette
     FROM commandes`);
   const { rows: [e] } = await query(`
-    SELECT COUNT(*)::int AS billets,
-           COALESCE(SUM(CASE WHEN c.pass = 'duo' THEN 2 ELSE 1 END) FILTER (WHERE b.entre_le IS NOT NULL), 0)::int AS personnes_entrees
-    FROM billets b JOIN commandes c ON c.id = b.commande_id WHERE b.statut = 'valide'`);
-  return { ...jauge, ...s, ...e };
+    SELECT COUNT(*) FILTER (WHERE b.commande_id IS NOT NULL)::int AS billets,
+           COALESCE(SUM(CASE WHEN b.pass = 'duo' THEN 2 ELSE 1 END) FILTER (WHERE b.entre_le IS NOT NULL), 0)::int AS personnes_entrees,
+           COALESCE(SUM(CASE WHEN b.pass = 'duo' THEN 2 ELSE 1 END) FILTER (WHERE b.entre_le IS NOT NULL AND b.canal = 'physique'), 0)::int AS entrees_physiques
+    FROM billets b WHERE b.statut = 'valide'`);
+  return { ...jauge, ...s, ...e, stock: await stockEnLigne() };
 }
 
 export async function listerCommandes({ q = '', statut = '' } = {}) {
