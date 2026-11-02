@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Babierland City · 1er janvier 2027 · Adzopé</title>
+<meta name="description" content="Babierland City, la soirée festive de la jeunesse d'Adzopé : DJ, jeux et talents. 1er janvier 2027 à 20h, Terrain de Marco (Amakpétabois). Réserve ton pass Solo ou Duo.">
+<meta name="theme-color" content="#D51D02">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Babierland City · 1er janvier 2027">
+<meta property="og:description" content="DJ, jeux et talents au Terrain de Marco, Adzopé. Pass Solo 6 000 F · Pass Duo 10 000 F.">
+<meta property="og:image" content="assets/visuels/affiche.webp">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  :root { color-scheme: light; }
+  .wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+  section { scroll-margin-top: 80px; }
+
+  /* ---------- Bandeau maquette ---------- */
+  .mock-flag { background: var(--encre); color: var(--creme); font-size: var(--fs-sm); text-align: center; padding: 8px 16px; }
+  .mock-flag a { color: var(--soleil); font-weight: 600; }
+
+  /* ---------- Header ---------- */
+  .nav { position: sticky; top: 0; z-index: var(--z-nav); background: rgba(213,29,2,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 2px solid var(--braise); }
+  .nav__in { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+  .nav__logo img { height: 46px; width: auto; }
+  .nav__links { display: none; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  .nav__links a { display: inline-flex; min-height: 44px; align-items: center; padding: 0 14px; color: var(--blanc); text-decoration: none; font-weight: 600; border-radius: var(--r-pill); transition: background-color var(--dur) var(--ease-out); }
+  .nav__links a:hover { background: rgba(255,255,255,.14); }
+  .nav .btn { min-height: 44px; padding: 10px 18px; font-size: var(--fs-sm); }
+  @media (min-width: 900px) { .nav__links { display: flex; } }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; padding: 28px 0 56px; }
+  .hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 28px; background: var(--bg); clip-path: polygon(0 100%, 100% 100%, 100% 0, 75% 70%, 50% 20%, 25% 75%, 0 10%); }
+  .hero__grid { display: grid; gap: 28px; align-items: center; }
+  .presents { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .presents img { height: 44px; width: auto; }
+  .presents .x { font: 900 1.6rem var(--font-sans); }
+  .presents small { width: 100%; text-align: center; font-weight: 700; letter-spacing: .3em; font-size: var(--fs-sm); }
+  .hero__logo { width: min(520px, 92%); margin: 6px auto 0; filter: drop-shadow(0 10px 24px rgba(122,10,2,.55)); }
+  .hero__meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px 22px; }
+  .hero__signs { display: grid; gap: 14px; justify-items: center; }
+  .hero__place { display: flex; gap: 10px; align-items: flex-start; font-weight: 800; text-transform: uppercase; line-height: 1.25; max-width: 320px; margin: 0 auto; }
+  .hero__place svg { color: var(--soleil); flex: none; width: 28px; height: 28px; }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .hero .btn--ghost { color: var(--blanc); }
+  .countdown { display: flex; gap: 8px; justify-content: center; }
+  .countdown div { background: rgba(27,18,16,.35); border: 1.5px solid rgba(255,255,255,.25); border-radius: var(--r-md); min-width: 70px; padding: 10px 8px 8px; text-align: center; }
+  .countdown b { display: block; font: 400 2rem/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--soleil); }
+  .countdown span { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+  .stock { max-width: 420px; margin-inline: auto; width: 100%; }
+  .stock__bar { height: 12px; border-radius: 99px; background: rgba(27,18,16,.35); overflow: hidden; border: 1.5px solid rgba(255,255,255,.3); }
+  .stock__bar i { display: block; height: 100%; width: var(--p); background: linear-gradient(90deg, var(--soleil), var(--citron)); border-radius: inherit; }
+  .stock p { display: flex; justify-content: space-between; margin: 6px 2px 0; font-size: var(--fs-sm); font-weight: 600; }
+  .hero__col { display: grid; gap: 22px; }
+  @media (min-width: 980px) {
+    .hero { padding: 40px 0 84px; }
+    .hero__grid { grid-template-columns: 1.15fr .85fr; }
+    .hero__col--right { justify-items: start; }
+    .hero__meta, .hero__ctas, .countdown { justify-content: flex-start; }
+    .stock, .hero__place { margin-inline: 0; }
+  }
+
+  /* ---------- Sections ---------- */
+  .sec { padding: 72px 0; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; font-size: var(--fs-sm); color: var(--brasier); }
+  .eyebrow::before { content: ""; width: 22px; height: 4px; background: currentColor; border-radius: 4px; }
+  h2.display { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.04; margin: 10px 0 14px; }
+  .lead { font-size: var(--fs-lg); color: var(--text-muted); max-width: 62ch; margin: 0; }
+
+  .acts { display: grid; gap: 16px; margin-top: 32px; }
+  @media (min-width: 760px) { .acts { grid-template-columns: repeat(3, 1fr); } }
+  .act { background: var(--surface); border: 2.5px solid var(--encre); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-2); transition: transform var(--dur) var(--ease-out); }
+  .act:hover { transform: translateY(-4px) rotate(-.4deg); }
+  .act__ico { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: var(--soleil); border: 2.5px solid var(--encre); margin-bottom: 14px; }
+  .act:nth-child(2) .act__ico { background: var(--citron); }
+  .act:nth-child(3) .act__ico { background: var(--flamme); }
+  .act h3 { font: 800 var(--fs-xl)/1.2 var(--font-sans); margin: 0 0 6px; }
+  .act p { margin: 0; color: var(--text-muted); }
+
+  /* ---------- Infos ---------- */
+  .infos { display: grid; gap: 20px; margin-top: 32px; }
+  @media (min-width: 900px) { .infos { grid-template-columns: .9fr 1.1fr; } }
+  .facts { display: grid; gap: 12px; margin: 0; align-content: start; }
+  .fact { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-md); padding: 16px 18px; }
+  .fact svg { color: var(--brasier); flex: none; width: 24px; height: 24px; margin-top: 2px; }
+  .fact dt { font-size: var(--fs-sm); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .fact dd { margin: 2px 0 0; font-weight: 700; font-size: var(--fs-lg); }
+  .map { position: relative; border: 2.5px solid var(--encre); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-2); min-height: 340px; display: grid; background: var(--panneau) radial-gradient(circle at 50% 45%, rgba(247,194,28,.35), transparent 55%); }
+  .map::before { content: "Terrain de Marco · Amakpétabois"; position: absolute; inset: auto 0 18px 0; text-align: center; color: var(--soleil); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .map iframe { position: relative; z-index: 1; }
+  .map iframe { width: 100%; height: 100%; min-height: 340px; border: 0; }
+
+  /* ---------- Pass ---------- */
+  .passes { display: grid; gap: 24px; margin-top: 36px; }
+  @media (min-width: 860px) { .passes { grid-template-columns: 1fr 1fr; } }
+  .pass { position: relative; display: grid; grid-template-columns: 1fr 104px; background: var(--brasier); color: var(--blanc); border-radius: var(--r-lg); border: 2.5px solid var(--encre); box-shadow: var(--shadow-2); }
+  .pass__main { padding: 24px; display: grid; gap: 10px; align-content: start; border-radius: var(--r-lg) 0 0 var(--r-lg); background-image: radial-gradient(120% 90% at 0 0, rgba(242,106,15,.6), transparent 60%); }
+  .pass__name { font: 400 2.4rem/1 var(--font-display); text-transform: uppercase; }
+  .pass__who { display: inline-flex; gap: 8px; align-items: center; font-weight: 700; }
+  .pass__who svg { width: 20px; height: 20px; }
+  .pass ul { list-style: none; padding: 0; margin: 6px 0 4px; display: grid; gap: 6px; }
+  .pass li { display: flex; gap: 8px; align-items: center; }
+  .pass li svg { width: 18px; height: 18px; color: var(--soleil); flex: none; }
+  .pass__stub { position: relative; background: var(--or-solo); color: var(--encre); display: grid; place-items: center; border-left: 3px dashed rgba(27,18,16,.6); border-radius: 0 calc(var(--r-lg) - 3px) calc(var(--r-lg) - 3px) 0; }
+  .pass--duo .pass__stub { background: var(--citron); }
+  .pass__stub::before, .pass__stub::after { content: ""; position: absolute; left: -15px; width: 26px; height: 26px; border-radius: 50%; background: var(--bg); border: 2.5px solid var(--encre); }
+  .pass__stub::before { top: -15px; clip-path: inset(50% 0 0 0); } .pass__stub::after { bottom: -15px; clip-path: inset(0 0 50% 0); }
+  .pass__price { writing-mode: vertical-rl; transform: rotate(180deg); font: 400 2.6rem/1 var(--font-display); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pass__price small { font-size: .5em; }
+  .pass__tag { position: absolute; top: -14px; right: 118px; background: var(--soleil); color: var(--encre); font-weight: 800; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; padding: 6px 10px; border-radius: var(--r-pill); border: 2px solid var(--encre); transform: rotate(3deg); }
+  .pass .btn { justify-self: start; margin-top: 6px; white-space: nowrap; }
+  @media (max-width: 480px) { .pass { grid-template-columns: 1fr 78px; } .pass__main { padding: 20px; } .pass__price { font-size: 2.1rem; } .pass__tag { right: 90px; } .pass .btn { padding: 12px 18px; font-size: var(--fs-sm); } }
+  .note { margin-top: 18px; display: flex; gap: 10px; align-items: flex-start; color: var(--text-muted); font-size: var(--fs-sm); }
+  .note svg { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--panneau); }
+
+  /* ---------- Inscription ---------- */
+  .reg { background: var(--encre); color: var(--creme); }
+  .reg .eyebrow { color: var(--soleil); }
+  .reg .lead { color: #D9C6B6; }
+  .card { background: var(--surface); color: var(--text); border-radius: var(--r-lg); border: 2.5px solid var(--encre); padding: 24px; box-shadow: 0 10px 0 var(--brasier); max-width: 720px; margin: 32px auto 0; }
+  .steps { display: flex; gap: 8px; list-style: none; margin: 0 0 22px; padding: 0; }
+  .steps li { flex: 1; display: grid; gap: 6px; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); }
+  .steps li::before { content: ""; height: 6px; border-radius: 6px; background: var(--border); transition: background-color var(--dur) var(--ease-out); }
+  .steps li[aria-current="step"], .steps li.done { color: var(--text); }
+  .steps li[aria-current="step"]::before { background: var(--brasier); }
+  .steps li.done::before { background: var(--panneau); }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { font: 800 var(--fs-xl)/1.2 var(--font-sans); margin-bottom: 14px; padding: 0; }
+  .choice { display: grid; gap: 12px; }
+  @media (min-width: 560px) { .choice { grid-template-columns: 1fr 1fr; } }
+  .opt { position: relative; }
+  .opt input { position: absolute; opacity: 0; inset: 0; }
+  .opt label { display: grid; gap: 4px; padding: 16px 18px; border: 2.5px solid var(--border); border-radius: var(--r-md); cursor: pointer; transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out); min-height: 56px; }
+  .opt label:hover { border-color: var(--encre); }
+  .opt input:checked + label { border-color: var(--encre); background: color-mix(in srgb, var(--soleil) 22%, var(--surface)); box-shadow: var(--shadow-1); }
+  .opt input:focus-visible + label { outline: 3px solid var(--flamme); outline-offset: 2px; }
+  .opt strong { font-size: var(--fs-lg); }
+  .opt span { color: var(--text-muted); font-size: var(--fs-sm); }
+  .opt .price { font: 400 1.6rem/1 var(--font-display); color: var(--brasier); }
+  .fields { display: grid; gap: 16px; }
+  @media (min-width: 560px) { .fields { grid-template-columns: 1fr 1fr; } .full { grid-column: 1 / -1; } }
+  .field { display: grid; gap: 6px; align-content: start; }
+  .field label { font-weight: 700; font-size: var(--fs-sm); }
+  .field label abbr { color: var(--brasier); text-decoration: none; }
+  .field input { font: inherit; font-size: 16px; min-height: 50px; padding: 12px 14px; border: 2px solid #A8937C; border-radius: var(--r-sm); background: var(--surface); color: var(--text); transition: border-color var(--dur) var(--ease-out); }
+  .field input:focus { outline: none; border-color: var(--encre); box-shadow: 0 0 0 3px color-mix(in srgb, var(--soleil) 60%, transparent); }
+  .field .help { font-size: var(--fs-sm); color: var(--text-muted); }
+  .field .err { font-size: var(--fs-sm); color: var(--danger); font-weight: 600; display: none; align-items: center; gap: 6px; }
+  .field .err svg { width: 16px; height: 16px; flex: none; }
+  .field.invalid input { border-color: var(--danger); }
+  .field.invalid .err { display: flex; }
+  .ops { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 560px) { .ops { grid-template-columns: repeat(4, 1fr); } }
+  .op label { justify-items: center; text-align: center; padding: 14px 8px; }
+  .op .dot { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: 13px; letter-spacing: .02em; }
+  .actions { display: flex; gap: 12px; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; }
+  .actions .btn--ghost { color: var(--text); }
+  .summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--r-md); background: var(--bg); border: 1.5px dashed #A8937C; margin-top: 18px; font-weight: 700; }
+  .summary b { font: 400 1.6rem/1 var(--font-display); color: var(--brasier); font-variant-numeric: tabular-nums; }
+  .pay-steps { margin: 14px 0 0; padding-left: 20px; color: var(--text-muted); }
+  .pay-steps li { margin: 4px 0; }
+  .ok { text-align: center; display: grid; gap: 14px; justify-items: center; }
+  .ok:focus { outline: none; }
+  .ok__ico { width: 64px; height: 64px; border-radius: 50%; background: var(--panneau); color: #fff; display: grid; place-items: center; }
+  .ok__ico svg { width: 34px; height: 34px; }
+  .eticket { width: 100%; max-width: 520px; display: grid; grid-template-columns: 1fr 130px; border-radius: var(--r-md); overflow: hidden; border: 2.5px solid var(--encre); text-align: left; }
+  .eticket__l { background: var(--brasier); color: #fff; padding: 16px 18px; display: grid; gap: 4px; }
+  .eticket__l .display { font-size: 1.8rem; color: var(--soleil); }
+  .eticket__r { background: var(--or-solo); display: grid; place-items: center; gap: 6px; padding: 10px; border-left: 3px dashed rgba(27,18,16,.6); }
+  .eticket.duo .eticket__r { background: var(--citron); }
+  .eticket__r #qr { background: #fff; padding: 6px; border-radius: 6px; }
+  .eticket__r #qr img, .eticket__r #qr canvas { width: 92px !important; height: 92px !important; }
+  .serial { font: 700 var(--fs-xs) ui-monospace, monospace; letter-spacing: .06em; }
+  [hidden] { display: none !important; }
+
+  /* ---------- Équipe ---------- */
+  .poles { display: grid; gap: 36px; margin-top: 36px; }
+  .pole h3.sign { font-size: var(--fs-base); --tilt: -2deg; margin: 0 0 18px 4px; }
+  .members { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (min-width: 700px) { .members { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1000px) { .poles { grid-template-columns: 1fr 1fr; } }
+  .member { margin: 0; background: var(--surface); border: 2px solid var(--encre); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-1); }
+  .member img, .member .ph { aspect-ratio: 1; width: 100%; object-fit: cover; background: var(--soleil); }
+  .member .ph { display: grid; place-items: center; font: 400 2.6rem var(--font-display); color: var(--encre); background: repeating-linear-gradient(45deg, var(--soleil) 0 14px, #F9CF45 14px 28px); }
+  .member figcaption { padding: 10px 12px 12px; }
+  .member strong { display: block; line-height: 1.25; }
+  .member span { font-size: var(--fs-sm); color: var(--text-muted); }
+
+  /* ---------- FAQ ---------- */
+  .faq { display: grid; gap: 10px; margin-top: 28px; max-width: 820px; }
+  .faq details { background: var(--surface); border: 2px solid var(--encre); border-radius: var(--r-md); }
+  .faq summary { cursor: pointer; list-style: none; padding: 16px 18px; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 700; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary svg { transition: transform var(--dur) var(--ease-out); flex: none; }
+  .faq details[open] summary svg { transform: rotate(45deg); }
+  .faq details p { margin: 0; padding: 0 18px 18px; color: var(--text-muted); }
+
+  /* ---------- Contact ---------- */
+  .contact { display: grid; gap: 14px; margin-top: 30px; }
+  @media (min-width: 760px) { .contact { grid-template-columns: repeat(4, 1fr); } }
+  .ct { display: grid; gap: 8px; align-content: start; padding: 20px; border-radius: var(--r-lg); background: rgba(27,18,16,.28); border: 2px solid rgba(255,255,255,.35); text-decoration: none; transition: background-color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out); }
+  .ct:hover { background: rgba(27,18,16,.42); transform: translateY(-3px); }
+  .ct svg { width: 28px; height: 28px; color: var(--soleil); }
+  .ct strong { font-size: var(--fs-lg); }
+  .ct span { font-size: var(--fs-sm); overflow-wrap: anywhere; }
+
+  footer { background: var(--braise); color: var(--creme); padding: 36px 0 110px; font-size: var(--fs-sm); }
+  .foot { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between; }
+  .foot__logos { display: flex; align-items: center; gap: 12px; }
+  .foot__logos img { height: 40px; width: auto; }
+  @media (min-width: 900px) { footer { padding-bottom: 36px; } }
+
+  /* ---------- Barre mobile ---------- */
+  .sticky-cta { position: fixed; inset: auto 0 0 0; z-index: var(--z-sticky); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--encre); display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--creme); border-top: 3px solid var(--soleil); }
+  .sticky-cta small { display: block; color: #D9C6B6; }
+  .sticky-cta b { font: 400 1.4rem/1 var(--font-display); color: var(--soleil); }
+  @media (min-width: 900px) { .sticky-cta { display: none; } }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="mock-flag" role="note">Maquette de travail · contenus et paiement simulés · <a href="index.html">Voir la charte graphique</a></div>
+
+<header class="nav">
+  <div class="wrap nav__in">
+    <a class="nav__logo" href="#top" aria-label="Babierland City, accueil"><img src="assets/logos/babierland-city.webp" alt="Babierland City" width="62" height="46"></a>
+    <nav aria-label="Navigation principale">
+      <ul class="nav__links">
+        <li><a href="#soiree">La soirée</a></li>
+        <li><a href="#infos">Infos pratiques</a></li>
+        <li><a href="#pass">Pass &amp; tarifs</a></li>
+        <li><a href="#equipe">L'équipe</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="btn" href="#inscription"><i data-lucide="ticket"></i>Réserver</a>
+  </div>
+</header>
+
+<main id="contenu">
+  <!-- ================= HERO ================= -->
+  <section class="hero lava" id="top" aria-labelledby="hero-title">
+    <div class="wrap hero__grid">
+      <div class="hero__col">
+        <div class="presents">
+          <img src="assets/logos/babierland.webp" alt="Babierland" width="124" height="44">
+          <span class="x" aria-hidden="true">×</span>
+          <img src="assets/logos/art-of-the-new-wave.webp" alt="Art of the New Wave" width="91" height="44">
+          <small>PRÉSENTENT</small>
+        </div>
+        <h1 id="hero-title" class="sr-only">Babierland City, 1er janvier 2027 à 20h, Adzopé</h1>
+        <img class="hero__logo" src="assets/logos/babierland-city.webp" alt="" width="694" height="516" fetchpriority="high">
+      </div>
+      <div class="hero__col hero__col--right">
+        <div class="hero__meta">
+          <div class="date-badge" aria-label="1er janvier 2027"><b>1</b>JANVIER<br>2027</div>
+          <div class="hero__signs" aria-hidden="true">
+            <span class="sign">Abidjan</span>
+            <span class="sign sign--right">Adzopé</span>
+          </div>
+        </div>
+        <p class="hero__place"><i data-lucide="map-pin"></i><span>Terrain de Marco (Amakpétabois), Adzopé · 20h</span></p>
+        <div class="countdown" role="timer" aria-label="Compte à rebours jusqu'à la soirée">
+          <div><b data-cd="d">00</b><span>jours</span></div>
+          <div><b data-cd="h">00</b><span>heures</span></div>
+          <div><b data-cd="m">00</b><span>min</span></div>
+          <div><b data-cd="s">00</b><span>sec</span></div>
+        </div>
+        <div class="stock">
+          <div class="stock__bar" role="progressbar" aria-label="Places réservées" aria-valuemin="0" aria-valuemax="300" aria-valuenow="113" style="--p:37.6%"><i></i></div>
+          <p><span>113 / 300 places parties</span><span>187 restantes</span></p>
+        </div>
+        <div class="hero__ctas">
+          <a class="btn btn--lg" href="#inscription"><i data-lucide="ticket"></i>Réserver mon pass</a>
+          <a class="btn btn--ghost btn--lg" href="#soiree"><i data-lucide="play"></i>Voir le teaser</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LA SOIRÉE ================= -->
+  <section class="sec" id="soiree" aria-labelledby="t-soiree">
+    <div class="wrap">
+      <span class="eyebrow">La soirée</span>
+      <h2 id="t-soiree" class="display">La nuit des talents d'Adzopé</h2>
+      <p class="lead">Babierland City, c'est <strong>la</strong> soirée festive de la jeunesse d'Adzopé. Ambiance DJ, jeux et prestations artistiques pour mettre en lumière les talents d'ici. On démarre l'année ensemble le 1er janvier 2027 à 20h au Terrain de Marco.</p>
+      <div class="acts">
+        <article class="act reveal"><div class="act__ico"><i data-lucide="disc-3"></i></div><h3>Ambiance DJ</h3><p>Des sets qui font bouger le terrain du début à la fin de la soirée.</p></article>
+        <article class="act reveal"><div class="act__ico"><i data-lucide="gamepad-2"></i></div><h3>Jeux</h3><p>Défis, challenges et lots à gagner entre deux sons.</p></article>
+        <article class="act reveal"><div class="act__ico"><i data-lucide="mic-vocal"></i></div><h3>Talents</h3><p>Chant, danse, rap, humour : la scène est à la jeunesse d'ici.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INFOS ================= -->
+  <section class="sec" id="infos" aria-labelledby="t-infos" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">Infos pratiques</span>
+      <h2 id="t-infos" class="display">Rendez-vous au Terrain de Marco</h2>
+      <div class="infos">
+        <dl class="facts">
+          <div class="fact"><i data-lucide="calendar-days"></i><div><dt>Date</dt><dd>Vendredi 1er janvier 2027</dd></div></div>
+          <div class="fact"><i data-lucide="clock-8"></i><div><dt>Ouverture</dt><dd>20h00</dd></div></div>
+          <div class="fact"><i data-lucide="map-pin"></i><div><dt>Lieu</dt><dd>Terrain de Marco, Amakpétabois · Adzopé (Côte d'Ivoire)</dd></div></div>
+          <div class="fact"><i data-lucide="users"></i><div><dt>Public</dt><dd>La jeunesse, de 15 à 30 ans</dd></div></div>
+          <a class="btn btn--green" href="https://www.google.com/maps/search/?api=1&amp;query=Terrain+de+Marco+Amakpetabois+Adzope" target="_blank" rel="noopener"><i data-lucide="navigation"></i>Itinéraire Google Maps</a>
+        </dl>
+        <div class="map">
+          <iframe title="Carte : Amakpétabois, Adzopé" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=Amakpetabois%2C%20Adzop%C3%A9%2C%20C%C3%B4te%20d%27Ivoire&amp;z=14&amp;output=embed"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PASS ================= -->
+  <section class="sec" id="pass" aria-labelledby="t-pass" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">Pass &amp; tarifs</span>
+      <h2 id="t-pass" class="display">Choisis ton pass</h2>
+      <p class="lead">300 places au total. Les inscriptions ferment dès que la jauge est pleine.</p>
+      <div class="passes">
+        <article class="pass pass--solo reveal">
+          <div class="pass__main">
+            <span class="pass__name">Pass Solo</span>
+            <span class="pass__who"><i data-lucide="user"></i>1 personne</span>
+            <ul>
+              <li><i data-lucide="check"></i>Accès à toute la soirée</li>
+              <li><i data-lucide="check"></i>E-ticket numéroté avec QR code</li>
+              <li><i data-lucide="check"></i>Confirmation par WhatsApp</li>
+            </ul>
+            <a class="btn" href="#inscription" data-pick="solo">Prendre le Solo</a>
+          </div>
+          <div class="pass__stub"><span class="pass__price">6 000 <small>F</small></span></div>
+        </article>
+        <article class="pass pass--duo reveal">
+          <span class="pass__tag">2 000 F d'économie</span>
+          <div class="pass__main">
+            <span class="pass__name">Pass Duo</span>
+            <span class="pass__who"><i data-lucide="users"></i>2 personnes</span>
+            <ul>
+              <li><i data-lucide="check"></i>Accès pour toi + 1 personne</li>
+              <li><i data-lucide="check"></i>Un seul e-ticket pour vous deux</li>
+              <li><i data-lucide="check"></i>Confirmation par WhatsApp</li>
+            </ul>
+            <a class="btn" href="#inscription" data-pick="duo">Prendre le Duo</a>
+          </div>
+          <div class="pass__stub"><span class="pass__price">10 000 <small>F</small></span></div>
+        </article>
+      </div>
+      <p class="note"><i data-lucide="smartphone"></i>Paiement mobile money : Wave, Orange Money, MTN MoMo et Moov Money.</p>
+    </div>
+  </section>
+
+  <!-- ================= INSCRIPTION ================= -->
+  <section class="sec reg" id="inscription" aria-labelledby="t-reg">
+    <div class="wrap">
+      <span class="eyebrow">Inscription</span>
+      <h2 id="t-reg" class="display">Réserve ta place en 3 étapes</h2>
+      <p class="lead">Ça prend 2 minutes. Ton e-ticket arrive sur WhatsApp et par e-mail.</p>
+
+      <form class="card" id="regForm" novalidate>
+        <ol class="steps" aria-label="Progression">
+          <li data-step="1" aria-current="step">1. Pass</li>
+          <li data-step="2">2. Tes infos</li>
+          <li data-step="3">3. Paiement</li>
+        </ol>
+
+        <fieldset data-panel="1">
+          <legend>Quel pass veux-tu ?</legend>
+          <div class="choice">
+            <div class="opt"><input type="radio" name="pass" id="p-solo" value="solo" checked><label for="p-solo"><strong>Pass Solo</strong><span>1 personne</span><b class="price">6 000 F</b></label></div>
+            <div class="opt"><input type="radio" name="pass" id="p-duo" value="duo"><label for="p-duo"><strong>Pass Duo</strong><span>2 personnes</span><b class="price">10 000 F</b></label></div>
+          </div>
+        </fieldset>
+
+        <fieldset data-panel="2" hidden>
+          <legend>Tes informations</legend>
+          <div class="fields">
+            <div class="field"><label for="f-nom">Nom <abbr title="obligatoire">*</abbr></label><input id="f-nom" name="nom" autocomplete="family-name" required><span class="err" role="alert"><i data-lucide="circle-alert"></i>Indique ton nom.</span></div>
+            <div class="field"><label for="f-prenom">Prénom <abbr title="obligatoire">*</abbr></label><input id="f-prenom" name="prenom" autocomplete="given-name" required><span class="err" role="alert"><i data-lucide="circle-alert"></i>Indique ton prénom.</span></div>
+            <div class="field"><label for="f-tel">Téléphone WhatsApp <abbr title="obligatoire">*</abbr></label><input id="f-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="07 00 00 00 00" required pattern="^(\+?225)?\s?0[157](\s?\d){8}$"><span class="help">10 chiffres. Ton ticket arrive ici.</span><span class="err" role="alert"><i data-lucide="circle-alert"></i>Numéro ivoirien à 10 chiffres (01, 05 ou 07…).</span></div>
+            <div class="field"><label for="f-mail">E-mail <abbr title="obligatoire">*</abbr></label><input id="f-mail" name="mail" type="email" autocomplete="email" required><span class="err" role="alert"><i data-lucide="circle-alert"></i>Adresse e-mail invalide (ex. nom@gmail.com).</span></div>
+            <div class="field full" data-duo hidden><label for="f-duo">Nom de la 2<sup>e</sup> personne <abbr title="obligatoire">*</abbr></label><input id="f-duo" name="duo" autocomplete="off"><span class="err" role="alert"><i data-lucide="circle-alert"></i>Indique le nom de la personne qui t'accompagne.</span></div>
+          </div>
+        </fieldset>
+
+        <fieldset data-panel="3" hidden>
+          <legend>Paiement mobile money</legend>
+          <div class="ops">
+            <div class="opt op"><input type="radio" name="op" id="o-wave" value="Wave" checked><label for="o-wave"><span class="dot" style="background:#1D7FD0">W</span><strong>Wave</strong></label></div>
+            <div class="opt op"><input type="radio" name="op" id="o-om" value="Orange Money"><label for="o-om"><span class="dot" style="background:#C2410C">OM</span><strong>Orange</strong></label></div>
+            <div class="opt op"><input type="radio" name="op" id="o-mtn" value="MTN MoMo"><label for="o-mtn"><span class="dot" style="background:#8A6A00">MTN</span><strong>MTN</strong></label></div>
+            <div class="opt op"><input type="radio" name="op" id="o-moov" value="Moov Money"><label for="o-moov"><span class="dot" style="background:#0057A8">M</span><strong>Moov</strong></label></div>
+          </div>
+          <ol class="pay-steps">
+            <li>Clique sur « Payer » : la demande de paiement s'ouvre sur ton téléphone.</li>
+            <li>Valide avec ton code secret mobile money.</li>
+            <li>Ton e-ticket numéroté arrive sur WhatsApp.</li>
+          </ol>
+          <div class="summary"><span id="sumLabel">Pass Solo · 1 personne</span><b id="sumPrice">6 000 F</b></div>
+        </fieldset>
+
+        <div class="ok" data-panel="4" hidden tabindex="-1" aria-live="polite">
+          <div class="ok__ico"><i data-lucide="check"></i></div>
+          <h3 class="display" style="font-size:2.2rem;margin:0">C'est validé&nbsp;!</h3>
+          <p style="margin:0;max-width:46ch">Ton inscription à Babierland City est confirmée. Rendez-vous le 1er janvier 2027 à 20h au Terrain de Marco, Amakpétabois (Adzopé). Prépare-toi pour une soirée d'ambiance avec DJ, jeux et talents&nbsp;!</p>
+          <div class="eticket" id="eticket">
+            <div class="eticket__l">
+              <span class="display" id="tkName">Pass Solo</span>
+              <strong id="tkWho">—</strong>
+              <span>1er janvier 2027 · 20h</span>
+              <span>Terrain de Marco, Adzopé</span>
+            </div>
+            <div class="eticket__r"><div id="qr" role="img" aria-label="QR code du ticket"></div><span class="serial" id="tkSerial">SOLO-001</span></div>
+          </div>
+          <button type="button" class="btn btn--ghost" id="restart"><i data-lucide="rotate-ccw"></i>Nouvelle réservation</button>
+        </div>
+
+        <div class="actions" id="actions">
+          <button type="button" class="btn btn--ghost" id="prev" hidden><i data-lucide="arrow-left"></i>Retour</button>
+          <button type="submit" class="btn btn--primary" id="next" style="margin-left:auto">Continuer<i data-lucide="arrow-right"></i></button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= ÉQUIPE ================= -->
+  <section class="sec" id="equipe" aria-labelledby="t-eq">
+    <div class="wrap">
+      <span class="eyebrow">L'équipe</span>
+      <h2 id="t-eq" class="display">Ceux qui font la City</h2>
+      <div class="poles">
+        <div class="pole">
+          <h3 class="sign">Direction des projets</h3>
+          <div class="members">
+            <figure class="member"><img src="assets/equipe/tanih-zede.webp" alt="Tanih Zede" width="400" height="400" loading="lazy"><figcaption><strong>Tanih Zede</strong><span>Responsable</span></figcaption></figure>
+            <figure class="member"><img src="assets/equipe/essan-kouakou-ezechiel.webp" alt="Essan Kouakou Ezechiel" width="400" height="400" loading="lazy"><figcaption><strong>Essan Kouakou Ezechiel</strong><span>Adjoint</span></figcaption></figure>
+          </div>
+        </div>
+        <div class="pole">
+          <h3 class="sign">Communication &amp; marketing</h3>
+          <div class="members">
+            <figure class="member"><img src="assets/equipe/brou-yann.webp" alt="Brou Yann" width="400" height="400" loading="lazy"><figcaption><strong>Brou Yann</strong><span>Responsable</span></figcaption></figure>
+            <figure class="member"><img src="assets/equipe/atta-junior.webp" alt="Atta Junior" width="400" height="400" loading="lazy"><figcaption><strong>Atta Junior</strong><span>Adjoint</span></figcaption></figure>
+            <figure class="member"><div class="ph" aria-hidden="true">AK</div><figcaption><strong>Alfred Kulai</strong><span>Membre</span></figcaption></figure>
+          </div>
+        </div>
+        <div class="pole">
+          <h3 class="sign">Logistique</h3>
+          <div class="members">
+            <figure class="member"><img src="assets/equipe/ibrahim-zouedet.webp" alt="Ibrahim Zouedet" width="400" height="400" loading="lazy"><figcaption><strong>Ibrahim Zouedet</strong><span>Responsable</span></figcaption></figure>
+            <figure class="member"><div class="ph" aria-hidden="true">JS</div><figcaption><strong>Junior Soumahoro</strong><span>Membre</span></figcaption></figure>
+          </div>
+        </div>
+        <div class="pole">
+          <h3 class="sign">Trésorerie &amp; finance</h3>
+          <div class="members">
+            <figure class="member"><img src="assets/equipe/djait-christ-franckie.webp" alt="Djait Christ Franckie" width="400" height="400" loading="lazy"><figcaption><strong>Djait Christ Franckie</strong><span>Responsable</span></figcaption></figure>
+            <figure class="member"><img src="assets/equipe/estelle-thobouet.webp" alt="Estelle Thobouet" width="400" height="400" loading="lazy"><figcaption><strong>Estelle Thobouet</strong><span>Adjointe</span></figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section class="sec" id="faq" aria-labelledby="t-faq" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">FAQ</span>
+      <h2 id="t-faq" class="display">Questions fréquentes</h2>
+      <div class="faq">
+        <details><summary>Comment je reçois mon ticket ?<i data-lucide="plus"></i></summary><p>Dès que ton paiement est validé, ton e-ticket numéroté (avec QR code) t'est envoyé sur WhatsApp et par e-mail. Présente-le à l'entrée.</p></details>
+        <details><summary>Le Pass Duo, c'est pour qui ?<i data-lucide="plus"></i></summary><p>Pour venir à deux. Un seul ticket, deux entrées. Indique simplement le nom de la deuxième personne à l'inscription.</p></details>
+        <details><summary>Quels moyens de paiement ?<i data-lucide="plus"></i></summary><p>Wave, Orange Money, MTN MoMo et Moov Money. Tu peux aussi confirmer ta réservation par WhatsApp.</p></details>
+        <details><summary>Il reste des places ?<i data-lucide="plus"></i></summary><p>La jauge est limitée à 300 personnes. Le compteur en haut de page est mis à jour en direct ; quand il est plein, les inscriptions ferment.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="sec lava" id="contact" aria-labelledby="t-ct">
+    <div class="wrap">
+      <span class="eyebrow" style="color:var(--soleil)">Contact</span>
+      <h2 id="t-ct" class="display">Une question ? Écris-nous</h2>
+      <div class="contact">
+        <a class="ct" href="tel:+2250172024010"><i data-lucide="phone"></i><strong>Réservations</strong><span>01 72 02 40 10</span></a>
+        <a class="ct" href="tel:+2250101908832"><i data-lucide="phone-call"></i><strong>Infos</strong><span>01 01 90 88 32</span></a>
+        <a class="ct" href="mailto:babierlandcity@gmail.com"><i data-lucide="mail"></i><strong>E-mail</strong><span>babierlandcity@gmail.com</span></a>
+        <a class="ct" href="https://tr.ee/aMASEJUkGw" target="_blank" rel="noopener"><i data-lucide="at-sign"></i><strong>@Babierlandcity</strong><span>WhatsApp · Facebook · Instagram · Snapchat</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="foot__logos">
+      <img src="assets/logos/babierland.webp" alt="Babierland" width="113" height="40" loading="lazy">
+      <span aria-hidden="true" style="font-weight:900">×</span>
+      <img src="assets/logos/art-of-the-new-wave.webp" alt="Art of the New Wave" width="83" height="40" loading="lazy">
+    </div>
+    <p style="margin:0">© 2026 Babierland City · Adzopé, Côte d'Ivoire</p>
+  </div>
+</footer>
+
+<div class="sticky-cta">
+  <div><small>Pass dès</small><b>6 000 F</b></div>
+  <a class="btn" href="#inscription">Réserver mon pass</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+  const icons = () => window.lucide && lucide.createIcons({ attrs: { 'stroke-width': 2.25, 'aria-hidden': 'true' } });
+  icons();
+
+  // ---- Compte à rebours (Abidjan = UTC+0) ----
+  const target = Date.UTC(2027, 0, 1, 20, 0, 0);
+  const cd = k => document.querySelector(`[data-cd="${k}"]`);
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    let s = Math.max(0, Math.floor((target - Date.now()) / 1000));
+    const d = Math.floor(s / 86400); s %= 86400;
+    cd('d').textContent = d; cd('h').textContent = pad(Math.floor(s / 3600));
+    cd('m').textContent = pad(Math.floor(s % 3600 / 60)); cd('s').textContent = pad(s % 60);
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---- Apparition au scroll ----
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 3) * 40 + 'ms'; io.observe(el); });
+
+  // ---- Formulaire en 3 étapes (simulation) ----
+  const form = document.getElementById('regForm');
+  const panels = [...form.querySelectorAll('[data-panel]')];
+  const stepsEl = [...form.querySelectorAll('.steps li')];
+  const prev = document.getElementById('prev'), next = document.getElementById('next'), actions = document.getElementById('actions');
+  const PASS = { solo: { label: 'Pass Solo · 1 personne', price: '6 000 F', name: 'Pass Solo' }, duo: { label: 'Pass Duo · 2 personnes', price: '10 000 F', name: 'Pass Duo' } };
+  const counters = { solo: 0, duo: 0 };
+  let step = 1;
+  const passVal = () => form.querySelector('input[name="pass"]:checked').value;
+
+  function show(n) {
+    step = n;
+    panels.forEach(p => p.hidden = +p.dataset.panel !== n);
+    stepsEl.forEach(li => { const k = +li.dataset.step; li.classList.toggle('done', k < n); k === n ? li.setAttribute('aria-current', 'step') : li.removeAttribute('aria-current'); });
+    prev.hidden = n === 1; actions.hidden = n === 4;
+    form.querySelector('.steps').hidden = n === 4;
+    next.innerHTML = n === 3 ? '<i data-lucide="lock"></i>Payer ' + PASS[passVal()].price : 'Continuer<i data-lucide="arrow-right"></i>';
+    icons();
+    const duo = passVal() === 'duo';
+    form.querySelector('[data-duo]').hidden = !duo; form.elements.duo.required = duo;
+    document.getElementById('sumLabel').textContent = PASS[passVal()].label;
+    document.getElementById('sumPrice').textContent = PASS[passVal()].price;
+  }
+
+  const fieldOk = inp => inp.value.trim() !== '' && inp.checkValidity();
+  function validate() {
+    const panel = form.querySelector(`[data-panel="${step}"]`);
+    let first = null;
+    panel.querySelectorAll('input[required]').forEach(inp => {
+      const f = inp.closest('.field'); if (!f || f.hidden) return;
+      const ok = fieldOk(inp);
+      f.classList.toggle('invalid', !ok); inp.setAttribute('aria-invalid', String(!ok));
+      if (!ok && !first) first = inp;
+    });
+    if (first) first.focus();
+    return !first;
+  }
+  // Efface l'erreur dès que la saisie devient valide (pendant la frappe, pas au blur : évite un décalage du bouton au clic)
+  form.addEventListener('input', e => { const f = e.target.closest('.field'); if (f && f.classList.contains('invalid') && fieldOk(e.target)) { f.classList.remove('invalid'); e.target.setAttribute('aria-invalid', 'false'); } });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validate()) return;
+    if (step < 3) return show(step + 1);
+    next.disabled = true; next.textContent = 'Paiement en cours…';
+    setTimeout(() => {
+      const p = passVal(); counters[p]++;
+      const serial = `${p.toUpperCase()}-${String(counters[p]).padStart(3, '0')}`;
+      document.getElementById('eticket').classList.toggle('duo', p === 'duo');
+      document.getElementById('tkName').textContent = PASS[p].name;
+      const el = form.elements;
+      document.getElementById('tkWho').textContent = `${el.prenom.value} ${el.nom.value}` + (p === 'duo' ? ` + ${el.duo.value}` : '');
+      document.getElementById('tkSerial').textContent = serial;
+      const qr = document.getElementById('qr'); qr.innerHTML = '';
+      if (window.QRCode) new QRCode(qr, { text: `BABIERLAND-CITY|${serial}|2027-01-01`, width: 92, height: 92, colorDark: '#1B1210', colorLight: '#ffffff' });
+      next.disabled = false; show(4); form.querySelector('[data-panel="4"]').focus();
+    }, 1200);
+  });
+  prev.addEventListener('click', () => show(step - 1));
+  document.getElementById('restart').addEventListener('click', () => { form.reset(); form.querySelectorAll('.invalid').forEach(f => f.classList.remove('invalid')); show(1); });
+  form.addEventListener('change', e => { if (e.target.name === 'pass') show(step); });
+  document.querySelectorAll('[data-pick]').forEach(a => a.addEventListener('click', () => { form.querySelector(`#p-${a.dataset.pick}`).checked = true; show(1); }));
+  show(1);
+</script>
+</body>
+</html>

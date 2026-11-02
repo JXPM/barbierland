@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin billetterie · Babierland City</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1B1210">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/vendor/fonts.css">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+  .wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+  [hidden] { display: none !important; }
+  .bar { background: var(--encre); color: var(--creme); border-bottom: 3px solid var(--soleil); position: sticky; top: 0; z-index: var(--z-nav); }
+  .bar__in { display: flex; align-items: center; gap: 12px; min-height: 64px; flex-wrap: wrap; padding: 8px 0; }
+  .bar img { height: 40px; width: auto; }
+  .bar h1 { font: 800 var(--fs-lg)/1.1 var(--font-sans); margin: 0; flex: 1; min-width: 140px; }
+  .bar .btn { min-height: 44px; padding: 8px 14px; font-size: var(--fs-sm); }
+  .bar .btn--ghost { color: var(--creme); }
+  .btn--sm { min-height: 40px; padding: 8px 14px; font-size: var(--fs-sm); }
+  .btn--sm svg { width: 18px; height: 18px; }
+  .btn--ghost.dark { color: var(--text); }
+
+  .login { max-width: 420px; margin: 12vh auto 0; background: var(--surface); border: 2.5px solid var(--encre); border-radius: var(--r-lg); padding: 28px 24px; box-shadow: 0 10px 0 var(--brasier); display: grid; gap: 14px; }
+  @media (max-width: 460px) { .login { margin: 8vh 16px 0; } }
+  .login img { height: 70px; width: auto; justify-self: center; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-weight: 700; font-size: var(--fs-sm); }
+  .field input, .field select { font: inherit; font-size: 16px; min-height: 48px; padding: 10px 12px; border: 2px solid #A8937C; border-radius: var(--r-sm); background: var(--surface); color: var(--text); width: 100%; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--encre); box-shadow: 0 0 0 3px color-mix(in srgb, var(--soleil) 60%, transparent); }
+  .msg-err { color: var(--danger); font-weight: 600; margin: 0; }
+
+  .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 22px 0; }
+  @media (min-width: 760px) { .kpis { grid-template-columns: repeat(6, 1fr); } }
+  .kpi { background: var(--surface); border: 2px solid var(--encre); border-radius: var(--r-md); padding: 14px; box-shadow: var(--shadow-1); }
+  .kpi span { display: block; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--text-muted); }
+  .kpi b { display: block; font: 400 1.9rem/1.1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #kRecette { font-size: 1.5rem; line-height: 1.45; }
+  @media (max-width: 520px) { .bar h1 { display: none; } .bar .lbl { display: none; } .bar__in { flex-wrap: nowrap; justify-content: space-between; } }
+  .kpi small { color: var(--text-muted); font-size: var(--fs-xs); }
+  .kpi--main { background: var(--soleil); color: var(--encre); }
+  .kpi--main span, .kpi--main small { color: var(--encre); }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { font: 700 var(--fs-sm) var(--font-sans); min-height: 40px; padding: 8px 14px; border-radius: var(--r-pill); border: 2px solid var(--encre); background: var(--surface); color: var(--text); cursor: pointer; }
+  .tab[aria-pressed="true"] { background: var(--encre); color: var(--creme); }
+  .search { flex: 1; min-width: 200px; }
+  .search input { font: inherit; font-size: 16px; width: 100%; min-height: 44px; padding: 8px 14px; border: 2px solid #A8937C; border-radius: var(--r-pill); background: var(--surface); color: var(--text); }
+
+  .list { display: grid; gap: 10px; margin-bottom: 48px; }
+  .row { background: var(--surface); border: 2px solid var(--border); border-left: 8px solid var(--border); border-radius: var(--r-md); padding: 14px 16px; display: grid; gap: 10px; }
+  .row.en_attente { border-left-color: var(--flamme); }
+  .row.payee { border-left-color: var(--panneau); }
+  .row.annulee { opacity: .6; }
+  .row__top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; }
+  .row__name { font-weight: 800; font-size: var(--fs-lg); }
+  .row__meta { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--text-muted); font-size: var(--fs-sm); }
+  .row__meta a { font-weight: 600; color: var(--text); }
+  .row__acts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mono { font-family: ui-monospace, monospace; font-weight: 700; letter-spacing: .04em; }
+  .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--encre); }
+  .tag--solo { background: var(--or-solo); color: var(--encre); }
+  .tag--duo { background: var(--citron); color: var(--encre); }
+  .tag--en_attente { background: #FFE2CC; color: #7A3500; border-color: #7A3500; }
+  .tag--payee { background: #DDF0E3; color: var(--panneau-fonce); border-color: var(--panneau-fonce); }
+  .tag--annulee { background: #EEE; color: #555; border-color: #555; }
+  .tag--entre { background: var(--panneau); color: #fff; border-color: var(--panneau); }
+  .empty { text-align: center; color: var(--text-muted); padding: 40px 0; }
+
+  dialog { border: 2.5px solid var(--encre); border-radius: var(--r-lg); padding: 0; width: min(520px, 100% - 24px); background: var(--surface); color: var(--text); box-shadow: 0 10px 0 var(--brasier); }
+  dialog::backdrop { background: rgba(27,18,16,.6); }
+  .dlg { padding: 22px; display: grid; gap: 14px; }
+  .dlg h2 { font: 800 var(--fs-xl)/1.2 var(--font-sans); margin: 0; }
+  .grid2 { display: grid; gap: 12px; }
+  @media (min-width: 520px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  .dlg__acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .done { background: #DDF0E3; color: var(--panneau-fonce); border: 2px solid var(--panneau-fonce); border-radius: var(--r-md); padding: 14px; display: grid; gap: 10px; }
+  .checks { display: grid; gap: 8px; }
+  .ck { display: flex; gap: 10px; align-items: flex-start; font-size: var(--fs-sm); cursor: pointer; }
+  .ck input { width: 20px; height: 20px; flex: none; margin: 1px 0 0; accent-color: var(--brasier); }
+  .ck a { font-weight: 700; }
+  .tag--mineur { background: #E8E0FF; color: #3B2A7A; border-color: #3B2A7A; }
+  .tag--anon { background: #EEE; color: #555; border-color: #999; }
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--encre); color: var(--creme); padding: 12px 18px; border-radius: var(--r-pill); font-weight: 600; z-index: var(--z-toast); max-width: calc(100% - 32px); }
+</style>
+</head>
+<body>
+
+<!-- ============ Connexion ============ -->
+<form class="login" id="login" hidden>
+  <img src="/assets/logos/babierland-city.webp" alt="Babierland City" width="94" height="70">
+  <h1 class="display" style="font-size:2rem;margin:0;text-align:center">Admin billetterie</h1>
+  <div class="field"><label for="cle">Code d’accès</label><input id="cle" type="password" autocomplete="current-password" required></div>
+  <p class="msg-err" id="loginErr" role="alert" hidden></p>
+  <button class="btn btn--primary" type="submit">Entrer</button>
+</form>
+
+<!-- ============ Application ============ -->
+<div id="app" hidden>
+  <header class="bar">
+    <div class="wrap bar__in">
+      <img src="/assets/logos/babierland-city.webp" alt="" width="54" height="40">
+      <h1>Billetterie</h1>
+      <button class="btn" type="button" id="btnVente"><i data-lucide="plus"></i>Vente guichet</button>
+      <button class="btn btn--ghost" type="button" id="btnAnnulerTicket" aria-label="Annuler un ticket (perdu, volé…)"><i data-lucide="ticket-x"></i><span class="lbl">Annuler un ticket</span></button>
+      <button class="btn btn--ghost" type="button" id="btnExport"><i data-lucide="file-spreadsheet"></i><span class="lbl">Export</span></button>
+      <button class="btn btn--ghost" type="button" id="btnPrive" aria-label="Vie privée et données personnelles"><i data-lucide="shield-check"></i><span class="lbl">Vie privée</span></button>
+      <button class="btn btn--ghost" type="button" id="btnQuit" aria-label="Se déconnecter"><i data-lucide="log-out"></i></button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="kpis" aria-label="Chiffres clés">
+      <div class="kpi kpi--main"><span>Places payées</span><b id="kPayees">0</b><small id="kJauge">/ 300</small></div>
+      <div class="kpi"><span>En attente</span><b id="kAttente">0</b><small id="kReservees">0 places bloquées</small></div>
+      <div class="kpi"><span>Pass Solo</span><b id="kSolo">0</b><small id="kSoloStock">vendus</small></div>
+      <div class="kpi"><span>Pass Duo</span><b id="kDuo">0</b><small id="kDuoStock">vendus</small></div>
+      <div class="kpi"><span>Recette</span><b id="kRecette">0 F</b><small>encaissée</small></div>
+      <div class="kpi"><span>Entrées</span><b id="kEntrees">0</b><small id="kEntreesSur">personnes</small></div>
+    </section>
+
+    <div class="tools">
+      <div class="tabs" role="group" aria-label="Filtrer">
+        <button class="tab" type="button" data-statut="en_attente" aria-pressed="true">En attente</button>
+        <button class="tab" type="button" data-statut="payee" aria-pressed="false">Payées</button>
+        <button class="tab" type="button" data-statut="annulee" aria-pressed="false">Annulées</button>
+        <button class="tab" type="button" data-statut="" aria-pressed="false">Toutes</button>
+      </div>
+      <label class="search"><span class="sr-only">Rechercher</span><input type="search" id="q" placeholder="Nom, téléphone, réf BC-…, n° S001…"></label>
+      <button class="btn btn--ghost dark btn--sm" type="button" id="btnRefresh" aria-label="Actualiser"><i data-lucide="refresh-cw"></i></button>
+    </div>
+
+    <div class="list" id="list" aria-live="polite"></div>
+  </main>
+</div>
+
+<!-- ============ Confirmer un paiement ============ -->
+<dialog id="dlgConf" aria-labelledby="dlgConfT">
+  <form class="dlg" id="formConf" novalidate>
+    <h2 id="dlgConfT">Confirmer le paiement</h2>
+    <p style="margin:0" id="confInfo"></p>
+    <div id="confFields" class="grid2">
+      <div class="field"><label for="cVendeur">Reçu par</label><input id="cVendeur" required placeholder="Ton prénom"></div>
+      <div class="field"><label for="cOp">Moyen</label><select id="cOp"></select></div>
+      <div class="field" style="grid-column:1/-1"><label for="cRef">Réf. de la transaction (facultatif)</label><input id="cRef" placeholder="ex. ID Wave"></div>
+    </div>
+    <p class="msg-err" id="confErr" role="alert" hidden></p>
+    <div class="done" id="confDone" hidden></div>
+    <div class="dlg__acts">
+      <button class="btn btn--ghost dark" type="button" id="confClose">Fermer</button>
+      <button class="btn btn--green" type="submit" id="confOk"><i data-lucide="check"></i>Paiement reçu</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ Vente au guichet ============ -->
+<dialog id="dlgVente" aria-labelledby="dlgVenteT">
+  <form class="dlg" id="formVente" novalidate>
+    <h2 id="dlgVenteT">Vente au guichet</h2>
+    <div id="venteFields" class="grid2">
+      <div class="field"><label for="vPass">Pass</label><select id="vPass" name="pass"><option value="solo">Solo · 6 000 F</option><option value="duo">Duo · 10 000 F</option></select></div>
+      <div class="field"><label for="vOp">Payé en</label><select id="vOp" name="operateur"></select></div>
+      <div class="field"><label for="vNom">Nom</label><input id="vNom" name="nom" required></div>
+      <div class="field"><label for="vPrenom">Prénom</label><input id="vPrenom" name="prenom" required></div>
+      <div class="field"><label for="vTel">Téléphone WhatsApp</label><input id="vTel" name="telephone" type="tel" inputmode="tel" required placeholder="07 00 00 00 00"></div>
+      <div class="field"><label for="vMail">E-mail (facultatif)</label><input id="vMail" name="email" type="email"></div>
+      <div class="field" id="vDuoF" hidden style="grid-column:1/-1"><label for="vDuo">Nom de la 2<sup>e</sup> personne</label><input id="vDuo" name="nom_duo"></div>
+      <div class="field" style="grid-column:1/-1"><label for="vVendeur">Encaissé par</label><input id="vVendeur" name="vendeur" required placeholder="Ton prénom"></div>
+      <div class="checks" style="grid-column:1/-1">
+        <label class="ck"><input type="checkbox" name="cgv"> <span>L'acheteur a été informé des <a href="/conditions" target="_blank">conditions de vente</a> et de la <a href="/confidentialite" target="_blank">politique de confidentialité</a> (affiche ou QR au guichet) et les accepte.</span></label>
+        <label class="ck"><input type="checkbox" name="mineur" id="vMineur"> <span>L'acheteur a moins de 18 ans</span></label>
+        <label class="ck" id="vParentF" hidden><input type="checkbox" name="autorisation_parentale"> <span>Accord d'un parent ou tuteur confirmé</span></label>
+        <label class="ck"><input type="checkbox" name="optin_infos"> <span>Il accepte de recevoir les infos des prochains événements (facultatif, à lui demander)</span></label>
+      </div>
+    </div>
+    <p class="msg-err" id="venteErr" role="alert" hidden></p>
+    <div class="done" id="venteDone" hidden></div>
+    <div class="dlg__acts">
+      <button class="btn btn--ghost dark" type="button" id="venteClose">Fermer</button>
+      <button class="btn btn--green" type="submit" id="venteOk"><i data-lucide="ticket"></i>Encaisser et émettre</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ Vie privée : droits des personnes (loi n° 2013-450) ============ -->
+<dialog id="dlgPrive" aria-labelledby="dlgPriveT">
+  <form class="dlg" id="formPrive" novalidate>
+    <h2 id="dlgPriveT">Vie privée</h2>
+    <p style="margin:0;font-size:var(--fs-sm)">Pour une demande d'accès, de copie ou de désinscription. Vérifie d'abord que la demande vient bien du numéro concerné (message WhatsApp reçu de ce numéro). Pour <strong>effacer</strong> une réservation, utilise « Effacer les données » sur la ligne de la commande.</p>
+    <div class="field"><label for="pTel">Numéro de la personne</label><input id="pTel" type="tel" inputmode="tel" placeholder="07 00 00 00 00" required></div>
+    <div class="dlg__acts" style="justify-content:flex-start">
+      <button class="btn btn--sm" type="submit" id="pVoir"><i data-lucide="search"></i>Voir ses données</button>
+      <button class="btn btn--ghost dark btn--sm" type="button" id="pDesab"><i data-lucide="bell-off"></i>Désabonner des infos</button>
+    </div>
+    <p class="msg-err" id="pErr" role="alert" hidden></p>
+    <div class="done" id="pRes" hidden></div>
+    <hr style="border:0;border-top:1.5px solid var(--border);margin:4px 0">
+    <button class="btn btn--ghost dark btn--sm" type="button" id="pAbonnes" style="justify-self:start"><i data-lucide="users"></i>Exporter les abonnés (consentement infos)</button>
+    <div class="dlg__acts"><button class="btn btn--ghost dark" type="button" id="pClose">Fermer</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="/vendor/lucide.min.js"></script>
+<script>
+  const icons = () => window.lucide && lucide.createIcons({ attrs: { 'stroke-width': 2.25, 'aria-hidden': 'true' } });
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fcfa = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  const quand = d => d ? new Date(d).toLocaleString('fr-FR', { timeZone: 'Africa/Abidjan', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+  const telLisible = t => t.replace(/^\+225/, '').replace(/(\d{2})(?=\d)/g, '$1 ');
+  const OPS = ['Wave', 'Orange Money', 'MTN MoMo', 'Moov Money', 'Espèces'];
+  const PASS = { solo: 'Pass Solo', duo: 'Pass Duo' };
+  const store = {
+    get: (k, s = sessionStorage) => { try { return s.getItem(k) || ''; } catch { return ''; } },
+    set: (k, v, s = sessionStorage) => { try { v ? s.setItem(k, v) : s.removeItem(k); } catch {} },
+  };
+
+  let cle = store.get('bc-admin');
+  let base = location.origin;
+  let filtre = 'en_attente';
+  let commandes = [];
+
+  for (const sel of [$('cOp'), $('vOp')]) sel.innerHTML = OPS.map(o => `<option>${o}</option>`).join('');
+  $('cVendeur').value = $('vVendeur').value = store.get('bc-vendeur', localStorage);
+
+  function toast(msg) {
+    $('toast').textContent = msg; $('toast').hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').hidden = true, 3500);
+  }
+
+  async function api(chemin, body) {
+    const r = await fetch(chemin, {
+      method: body ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json', 'x-cle': cle, 'x-acteur': encodeURIComponent(store.get('bc-vendeur', localStorage) || 'admin') },
+      body: body && JSON.stringify(body),
+    });
+    if (r.status === 401) { deconnecter('Code d’accès incorrect.'); throw new Error('401'); }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw Object.assign(new Error(d.message || 'Erreur'), { data: d });
+    return d;
+  }
+
+  // ---------- Liens WhatsApp ----------
+  const lienBillet = c => `${base}/t/${encodeURIComponent(c.code)}`;
+  const wa = (tel, texte) => `https://wa.me/${tel.replace(/\D/g, '')}` + (texte ? `?text=${encodeURIComponent(texte)}` : '');
+  const waBillet = c => wa(c.telephone, [
+    `Salut ${c.prenom} ! 🎉 Paiement reçu, ta place pour Babierland City est confirmée.`,
+    `${PASS[c.pass]}${c.pass === 'duo' ? ` (toi + ${c.nom_duo})` : ''} · Billet n° ${c.numero}`,
+    `Ton billet avec QR code : ${lienBillet(c)}`,
+    `Rendez-vous le vendredi 1er janvier 2027 à 20h au Terrain de Marco (Amakpétabois), Adzopé. Présente ton QR à l'entrée. Il ne marche qu'une fois : ne le partage pas !`,
+  ].join('\n\n'));
+  const waRelance = c => wa(c.telephone, `Salut ${c.prenom} ! Ta réservation Babierland City ${c.ref} (${PASS[c.pass]}, ${fcfa(c.montant)}) attend ton paiement. Dis-nous quand c'est envoyé et on t'envoie ton billet 🎟️`);
+
+  // ---------- Rendu ----------
+  function rendreStats(s) {
+    $('kPayees').textContent = s.payees;
+    $('kJauge').textContent = `/ ${s.jauge} · ${s.restantes} libres`;
+    $('kAttente').textContent = s.en_attente;
+    $('kReservees').textContent = `${s.reservees} place${s.reservees > 1 ? 's' : ''} bloquée${s.reservees > 1 ? 's' : ''}`;
+    $('kSolo').textContent = s.solo;
+    $('kDuo').textContent = s.duo;
+    $('kSoloStock').textContent = `vendus · ${s.stock.solo.libres} tickets en ligne libres`;
+    $('kDuoStock').textContent = `vendus · ${s.stock.duo.libres} tickets en ligne libres`;
+    $('kRecette').textContent = fcfa(s.recette);
+    $('kEntrees').textContent = s.personnes_entrees;
+    $('kEntreesSur').textContent = `sur ${s.payees} attendues`;
+  }
+
+  function rendreListe() {
+    if (!commandes.length) { $('list').innerHTML = '<p class="empty">Aucune commande ici.</p>'; return; }
+    $('list').innerHTML = commandes.map((c, i) => {
+      const actes = [];
+      if (c.statut === 'en_attente') {
+        actes.push(`<button class="btn btn--green btn--sm" type="button" data-act="confirmer" data-i="${i}"><i data-lucide="check"></i>Paiement reçu</button>`);
+        actes.push(`<a class="btn btn--ghost dark btn--sm" href="${esc(waRelance(c))}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i>Relancer</a>`);
+      }
+      if (c.statut === 'payee' && c.code) {
+        actes.push(`<a class="btn btn--green btn--sm" href="${esc(waBillet(c))}" target="_blank" rel="noopener"><i data-lucide="send"></i>Envoyer le billet</a>`);
+        actes.push(`<a class="btn btn--ghost dark btn--sm" href="${esc(lienBillet(c))}" target="_blank" rel="noopener"><i data-lucide="qr-code"></i>Voir</a>`);
+      }
+      if (c.statut !== 'annulee') actes.push(`<button class="btn btn--ghost dark btn--sm" type="button" data-act="annuler" data-i="${i}"><i data-lucide="x"></i>Annuler</button>`);
+      if (!c.anonymisee_le) actes.push(`<button class="btn btn--ghost dark btn--sm" type="button" data-act="anonymiser" data-i="${i}"><i data-lucide="eraser"></i>Effacer les données</button>`);
+      return `<article class="row ${c.statut}">
+        <div class="row__top">
+          <span class="row__name">${esc(c.prenom)} ${esc(c.nom)}${c.nom_duo ? ` <span style="font-weight:600">+ ${esc(c.nom_duo)}</span>` : ''}</span>
+          <span class="tag tag--${c.pass}">${c.pass}</span>
+          <span class="tag tag--${c.statut}">${{ en_attente: 'En attente', payee: 'Payée', annulee: 'Annulée' }[c.statut]}</span>
+          ${c.entre_le ? `<span class="tag tag--entre">Entré ${quand(c.entre_le)}</span>` : ''}
+          ${c.mineur ? '<span class="tag tag--mineur">−18 ans</span>' : ''}
+          ${c.anonymisee_le ? '<span class="tag tag--anon">Données effacées</span>' : ''}
+          ${c.numero ? `<span class="mono">${esc(c.numero)}</span>` : ''}
+        </div>
+        <div class="row__meta">
+          <span class="mono">${esc(c.ref)}</span>
+          <a href="${esc(wa(c.telephone))}" target="_blank" rel="noopener">${esc(telLisible(c.telephone))}</a>
+          ${c.email ? `<span>${esc(c.email)}</span>` : ''}
+          <span>${fcfa(c.montant)}${c.operateur ? ' · ' + esc(c.operateur) : ''}</span>
+          <span>${c.canal === 'guichet' ? 'Guichet' : 'Site'} · ${quand(c.cree_le)}</span>
+          ${c.vendeur ? `<span>par ${esc(c.vendeur)}</span>` : ''}
+          ${c.note ? `<span>« ${esc(c.note)} »</span>` : ''}
+        </div>
+        ${actes.length ? `<div class="row__acts">${actes.join('')}</div>` : ''}
+      </article>`;
+    }).join('');
+    icons();
+  }
+
+  async function charger() {
+    const qs = new URLSearchParams({ statut: filtre, q: $('q').value.trim() });
+    const d = await api('/api/admin/commandes?' + qs);
+    base = d.base; commandes = d.commandes;
+    rendreStats(d.stats); rendreListe();
+  }
+
+  // ---------- Connexion ----------
+  function deconnecter(msg) {
+    cle = ''; store.set('bc-admin', '');
+    $('app').hidden = true; $('login').hidden = false;
+    $('loginErr').textContent = msg || ''; $('loginErr').hidden = !msg;
+    $('cle').focus();
+  }
+  $('login').addEventListener('submit', async e => {
+    e.preventDefault();
+    cle = $('cle').value.trim();
+    try {
+      await charger();
+      store.set('bc-admin', cle);
+      $('login').hidden = true; $('app').hidden = false; $('cle').value = '';
+      icons();
+    } catch (err) {
+      if (err.message !== '401') { $('loginErr').textContent = err.message; $('loginErr').hidden = false; }
+    }
+  });
+  $('btnQuit').addEventListener('click', () => deconnecter());
+
+  // ---------- Filtres ----------
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    filtre = t.dataset.statut;
+    document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-pressed', String(x === t)));
+    charger().catch(() => {});
+  }));
+  let tq;
+  $('q').addEventListener('input', () => { clearTimeout(tq); tq = setTimeout(() => charger().catch(() => {}), 250); });
+  $('btnRefresh').addEventListener('click', () => charger().then(() => toast('À jour')).catch(() => {}));
+
+  // ---------- Actions sur une commande ----------
+  let enCours = null;
+  $('list').addEventListener('click', async e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const c = commandes[+b.dataset.i];
+    if (b.dataset.act === 'anonymiser') {
+      const avert = c.statut === 'payee' && !c.entre_le ? `\n\nLe billet ${c.numero} reste valable mais ne sera plus au nom de ${c.prenom}.` : '';
+      if (!confirm(`Effacer définitivement le nom, le téléphone et l'e-mail de ${c.prenom} ${c.nom} (${c.ref}) ?\nÀ faire sur demande de la personne (droit à l'effacement).${avert}`)) return;
+      try { await api('/api/admin/commandes', { action: 'anonymiser', ref: c.ref }); toast('Données effacées'); charger(); }
+      catch (err) { if (err.message !== '401') toast(err.message); }
+      return;
+    }
+    if (b.dataset.act === 'annuler') {
+      const note = prompt(`Annuler ${c.ref} (${c.prenom} ${c.nom}) ?${c.numero ? `\nLe billet ${c.numero} ne pourra plus entrer.` : ''}\n\nMotif (facultatif) :`);
+      if (note === null) return;
+      try { await api('/api/admin/commandes', { action: 'annuler', ref: c.ref, note }); toast(`${c.ref} annulée`); charger(); }
+      catch (err) { if (err.message !== '401') toast(err.message); }
+      return;
+    }
+    enCours = c;
+    $('confInfo').innerHTML = `<strong>${esc(c.prenom)} ${esc(c.nom)}</strong> · ${PASS[c.pass]} · <strong>${fcfa(c.montant)}</strong> · <span class="mono">${esc(c.ref)}</span>`;
+    if (c.operateur) $('cOp').value = c.operateur;
+    $('cRef').value = '';
+    $('confErr').hidden = true; $('confDone').hidden = true; $('confFields').hidden = false; $('confOk').hidden = false;
+    $('dlgConf').showModal();
+  });
+  $('confClose').addEventListener('click', () => $('dlgConf').close());
+
+  $('formConf').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!$('cVendeur').value.trim()) { $('cVendeur').focus(); return; }
+    store.set('bc-vendeur', $('cVendeur').value.trim(), localStorage);
+    $('confOk').disabled = true; $('confErr').hidden = true;
+    // Onglet ouvert pendant le clic (sinon bloqué) : il bascule sur WhatsApp, billet pré-rempli, dès l'émission.
+    const fenetreWa = window.open('', '_blank');
+    try {
+      const r = await api('/api/admin/commandes', { action: 'confirmer', ref: enCours.ref, vendeur: $('cVendeur').value, operateur: $('cOp').value, paiement_ref: $('cRef').value });
+      const c = { ...enCours, ...r.commande, numero: r.billet.numero, code: r.billet.code };
+      if (fenetreWa) fenetreWa.location.href = waBillet(c);
+      $('confFields').hidden = true; $('confOk').hidden = true;
+      $('confDone').innerHTML = `<strong>Billet ${esc(c.numero)} attribué ✓</strong>
+        <span>${fenetreWa ? 'WhatsApp s’est ouvert avec le billet : appuie sur Envoyer.' : 'Envoie-lui le billet :'} Il le voit aussi sur sa page de suivi.</span>
+        <a class="btn btn--green" href="${esc(waBillet(c))}" target="_blank" rel="noopener"><i data-lucide="send"></i>${fenetreWa ? 'Rouvrir WhatsApp' : 'Envoyer le billet sur WhatsApp'}</a>
+        <a href="${esc(lienBillet(c))}" target="_blank" rel="noopener">Voir le billet</a>`;
+      $('confDone').hidden = false; icons();
+      charger();
+    } catch (err) {
+      if (fenetreWa) fenetreWa.close();
+      if (err.message !== '401') { $('confErr').textContent = err.message; $('confErr').hidden = false; }
+    } finally { $('confOk').disabled = false; }
+  });
+
+  // ---------- Annuler un ticket (papier perdu ou volé, ticket en ligne à retirer) ----------
+  $('btnAnnulerTicket').addEventListener('click', async () => {
+    const numero = prompt('N° du ticket à annuler (ex. S142, D201) ?\nIl sera refusé à l’entrée. Pour une réservation du site, utilise plutôt « Annuler » sur la commande.');
+    if (!numero || !numero.trim()) return;
+    if (!confirm(`Annuler définitivement le ticket ${numero.trim().toUpperCase()} ?`)) return;
+    try { const r = await api('/api/admin/commandes', { action: 'annuler_billet', numero }); toast(`Ticket ${r.numero} annulé`); charger(); }
+    catch (err) { if (err.message !== '401') toast(err.message); }
+  });
+  // ---------- Vente au guichet ----------
+  const fv = $('formVente');
+  $('btnVente').addEventListener('click', () => {
+    fv.reset(); $('vVendeur').value = store.get('bc-vendeur', localStorage); $('vOp').value = 'Espèces';
+    $('vDuoF').hidden = true; $('vParentF').hidden = true; $('venteErr').hidden = true; $('venteDone').hidden = true;
+    $('venteFields').hidden = false; $('venteOk').hidden = false;
+    $('dlgVente').showModal(); $('vNom').focus();
+  });
+  $('vPass').addEventListener('change', () => { $('vDuoF').hidden = $('vPass').value !== 'duo'; });
+  $('vMineur').addEventListener('change', () => { $('vParentF').hidden = !$('vMineur').checked; });
+  $('venteClose').addEventListener('click', () => $('dlgVente').close());
+  fv.addEventListener('submit', async e => {
+    e.preventDefault();
+    const corps = Object.fromEntries(new FormData(fv));
+    for (const k of ['cgv', 'mineur', 'autorisation_parentale', 'optin_infos']) corps[k] = fv.elements[k].checked;
+    corps.action = 'vendre';
+    store.set('bc-vendeur', (corps.vendeur || '').trim(), localStorage);
+    $('venteOk').disabled = true; $('venteErr').hidden = true;
+    try {
+      const r = await api('/api/admin/commandes', corps);
+      const c = { ...r.commande, numero: r.billet.numero, code: r.billet.code };
+      $('venteFields').hidden = true; $('venteOk').hidden = true;
+      $('venteDone').innerHTML = `<strong>Billet ${esc(c.numero)} émis pour ${esc(c.prenom)} ✓</strong>
+        <a class="btn btn--green" href="${esc(waBillet(c))}" target="_blank" rel="noopener"><i data-lucide="send"></i>Envoyer le billet sur WhatsApp</a>
+        <a href="${esc(lienBillet(c))}" target="_blank" rel="noopener">Voir / imprimer le billet</a>`;
+      $('venteDone').hidden = false; icons();
+      charger();
+    } catch (err) {
+      if (err.message === '401') return;
+      const champs = err.data && err.data.champs;
+      $('venteErr').textContent = champs ? Object.values(champs).join(' ') : err.message;
+      $('venteErr').hidden = false;
+    } finally { $('venteOk').disabled = false; }
+  });
+
+  // ---------- Export ----------
+  $('btnExport').addEventListener('click', async () => {
+    if (await telecharger('/api/admin/export', `babierland-city-billetterie-${new Date().toISOString().slice(0, 10)}.csv`)) {
+      toast('Export téléchargé (confidentiel : contient les codes)');
+    }
+  });
+
+  async function telecharger(chemin, nom, blob) {
+    if (!blob) {
+      const r = await fetch(chemin, { headers: { 'x-cle': cle, 'x-acteur': encodeURIComponent(store.get('bc-vendeur', localStorage) || 'admin') } });
+      if (!r.ok) { toast('Téléchargement impossible'); return false; }
+      blob = await r.blob();
+    }
+    const url = URL.createObjectURL(blob);
+    Object.assign(document.createElement('a'), { href: url, download: nom }).click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  }
+
+  // ---------- Vie privée ----------
+  $('btnPrive').addEventListener('click', () => { $('pErr').hidden = true; $('pRes').hidden = true; $('dlgPrive').showModal(); $('pTel').focus(); });
+  $('pClose').addEventListener('click', () => $('dlgPrive').close());
+  $('formPrive').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('pErr').hidden = true; $('pRes').hidden = true;
+    try {
+      const d = await api('/api/admin/commandes', { action: 'donnees', telephone: $('pTel').value });
+      const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+      $('pRes').innerHTML = `<span><strong>${d.commandes.length}</strong> commande(s) · abonné aux infos : <strong>${d.abonnement_infos ? 'oui' : 'non'}</strong></span>
+        ${d.commandes.map(c => `<span class="mono" style="font-size:var(--fs-sm)">${esc(c.ref)} · ${esc(c.prenom)} ${esc(c.nom)} · ${c.pass} · ${esc(c.statut)}${c.numero ? ' · ' + esc(c.numero) : ''}</span>`).join('')}
+        <button class="btn btn--green btn--sm" type="button" id="pDl"><i data-lucide="download"></i>Télécharger la copie (JSON)</button>`;
+      $('pRes').hidden = false; icons();
+      $('pDl').onclick = () => telecharger(null, `donnees-${d.telephone.replace(/\D/g, '')}.json`, blob);
+    } catch (err) { if (err.message !== '401') { $('pErr').textContent = err.message; $('pErr').hidden = false; } }
+  });
+  $('pDesab').addEventListener('click', async () => {
+    $('pErr').hidden = true;
+    try {
+      const r = await api('/api/admin/commandes', { action: 'desabonner', telephone: $('pTel').value });
+      toast(r.supprime ? 'Désabonné des infos' : 'Ce numéro n’était pas abonné');
+    } catch (err) { if (err.message !== '401') { $('pErr').textContent = err.message; $('pErr').hidden = false; } }
+  });
+  $('pAbonnes').addEventListener('click', () => telecharger('/api/admin/export?type=abonnes', `babierland-city-abonnes-${new Date().toISOString().slice(0, 10)}.csv`));
+
+  // ---------- Démarrage ----------
+  icons();
+  if (cle) charger().then(() => { $('login').hidden = true; $('app').hidden = false; icons(); }).catch(() => {});
+  else deconnecter();
+  setInterval(() => { if (cle && !document.hidden && !document.querySelector('dialog[open]')) charger().catch(() => {}); }, 30000);
+</script>
+</body>
+</html>

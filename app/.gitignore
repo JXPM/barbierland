@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.test
+.vercel
+# copie générée depuis site/assets (npm run sync-assets)
+public/assets/
+# exports CSV : contiennent les codes secrets
+*.csv
+.deploy.env

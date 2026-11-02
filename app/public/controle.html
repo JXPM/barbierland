@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contrôle entrée · Babierland City</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1B1210">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/vendor/fonts.css">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+  :root { color-scheme: dark; }
+  body { background: var(--encre); color: var(--creme); min-height: 100dvh; }
+  [hidden] { display: none !important; }
+  .login { max-width: 420px; margin: 10vh auto 0; padding: 0 16px; display: grid; gap: 14px; }
+  .login img { height: 76px; width: auto; justify-self: center; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-weight: 700; font-size: var(--fs-sm); }
+  .field input { font: inherit; font-size: 16px; min-height: 52px; padding: 10px 14px; border: 2px solid #6B5A52; border-radius: var(--r-sm); background: #24150F; color: var(--creme); }
+  .field input:focus { outline: none; border-color: var(--soleil); }
+  .msg-err { color: #FF8A80; font-weight: 600; margin: 0; }
+
+  .app { display: grid; grid-template-rows: auto 1fr auto; min-height: 100dvh; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 3px solid var(--soleil); }
+  .top img { height: 36px; width: auto; }
+  .count { text-align: right; line-height: 1.1; }
+  .count b { font: 400 1.8rem/1 var(--font-display); color: var(--soleil); font-variant-numeric: tabular-nums; }
+  .count small { display: block; font-size: var(--fs-xs); color: #CDB8A8; }
+  .cam { position: relative; overflow: hidden; background: #000; display: grid; place-items: center; min-height: 50dvh; }
+  .cam video { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .frame { position: relative; width: min(68vw, 300px); aspect-ratio: 1; border-radius: 22px; box-shadow: 0 0 0 100vmax rgba(0,0,0,.45); border: 4px solid var(--soleil); }
+  .cam p { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; margin: 0; font-weight: 700; text-shadow: 0 1px 4px #000; padding: 0 16px; }
+  .start { position: absolute; inset: 0; display: grid; place-content: center; gap: 12px; text-align: center; padding: 16px; background: var(--encre); z-index: 2; }
+  .bottom { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: grid; gap: 10px; }
+  .manual { display: flex; gap: 8px; }
+  .manual input { flex: 1; min-width: 0; font: 600 16px ui-monospace, monospace; min-height: 48px; padding: 8px 12px; border: 2px solid #6B5A52; border-radius: var(--r-sm); background: #24150F; color: var(--creme); text-transform: uppercase; }
+  .manual .btn { min-height: 48px; padding: 8px 16px; }
+  .meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: var(--fs-sm); color: #CDB8A8; }
+  .meta button { background: none; border: 0; color: inherit; text-decoration: underline; font: inherit; cursor: pointer; padding: 8px 0; min-height: 44px; }
+
+  .result { position: fixed; inset: 0; z-index: var(--z-modal); display: grid; place-content: center; justify-items: center; gap: 10px; padding: 24px; text-align: center; cursor: pointer; }
+  .result.ok { background: #1E7A3E; color: #fff; }
+  .result.warn { background: #F26A0F; color: var(--encre); }
+  .result.bad { background: #B3261E; color: #fff; }
+  .result svg { width: 96px; height: 96px; }
+  .result h2 { font: 400 clamp(2.6rem, 12vw, 4.5rem)/1 var(--font-display); text-transform: uppercase; margin: 0; }
+  .result .who { font-size: 1.5rem; font-weight: 800; line-height: 1.25; }
+  .result .pers { font: 400 2rem/1 var(--font-display); padding: 8px 18px; border-radius: var(--r-pill); background: rgba(0,0,0,.22); }
+  .result small { font-weight: 600; opacity: .9; }
+</style>
+</head>
+<body>
+
+<form class="login" id="login" hidden>
+  <img src="/assets/logos/babierland-city.webp" alt="Babierland City" width="102" height="76">
+  <h1 class="display" style="font-size:2.2rem;margin:0;text-align:center;color:var(--soleil)">Contrôle entrée</h1>
+  <div class="field"><label for="cle">Code équipe accueil</label><input id="cle" type="password" autocomplete="current-password" required></div>
+  <div class="field"><label for="poste">Nom du poste</label><input id="poste" placeholder="ex. Porte principale" required></div>
+  <p class="msg-err" id="loginErr" role="alert" hidden></p>
+  <button class="btn btn--lg" type="submit">Commencer</button>
+</form>
+
+<div class="app" id="app" hidden>
+  <header class="top">
+    <img src="/assets/logos/babierland-city.webp" alt="Babierland City" width="48" height="36">
+    <div class="count" aria-live="polite"><b id="nEntres">0</b><small id="nSur">entrés</small></div>
+  </header>
+
+  <div class="cam">
+    <video id="video" playsinline muted></video>
+    <div class="frame" aria-hidden="true"></div>
+    <p id="camMsg">Vise le QR code du billet</p>
+    <div class="start" id="start">
+      <p style="position:static;margin:0;text-shadow:none">La caméra sert à lire les QR codes.</p>
+      <button class="btn btn--lg" type="button" id="btnCam"><i data-lucide="scan-line"></i>Activer la caméra</button>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <form class="manual" id="manual">
+      <label class="sr-only" for="saisie">Code du billet</label>
+      <input id="saisie" placeholder="Code du billet (S001-…)" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <button class="btn" type="submit">Valider</button>
+    </form>
+    <div class="meta"><span id="posteAff"></span><button type="button" id="btnQuit">Changer de poste</button></div>
+  </div>
+</div>
+
+<div class="result" id="result" hidden role="alert"></div>
+
+<script src="/vendor/jsQR.min.js"></script>
+<script src="/vendor/lucide.min.js"></script>
+<script>
+  const icons = () => window.lucide && lucide.createIcons({ attrs: { 'stroke-width': 2.25, 'aria-hidden': 'true' } });
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const heure = d => new Date(d).toLocaleTimeString('fr-FR', { timeZone: 'Africa/Abidjan', hour: '2-digit', minute: '2-digit' });
+  const store = {
+    get: k => { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+    set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} },
+  };
+  let cle = store.get('bc-controle');
+  let poste = store.get('bc-poste');
+
+  async function api(body) {
+    const r = await fetch('/api/controle', {
+      method: body ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json', 'x-cle': cle },
+      body: body && JSON.stringify(body),
+    });
+    if (r.status === 401) { quitter('Code incorrect.'); throw new Error('401'); }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.message || 'Erreur réseau');
+    return d;
+  }
+
+  async function compteur() {
+    try {
+      const d = await api();
+      $('nEntres').textContent = d.personnes_entrees;
+      $('nSur').textContent = `entrés (dont ${d.entrees_physiques} avec ticket papier)`;
+    } catch {}
+  }
+
+  // ---------- Retour visuel + son ----------
+  let audio;
+  function bip(ok) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = ok ? 880 : 220; o.type = ok ? 'sine' : 'square';
+      g.gain.value = .15; o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + (ok ? .15 : .5));
+    } catch {}
+    if (navigator.vibrate) navigator.vibrate(ok ? 80 : [200, 80, 200]);
+  }
+
+  let occupe = false;
+  function afficher(type, html) {
+    const r = $('result');
+    r.className = 'result ' + type;
+    r.innerHTML = html;
+    r.hidden = false;
+    icons();
+    clearTimeout(afficher.t);
+    afficher.t = setTimeout(fermer, type === 'ok' ? 2200 : 5000);
+  }
+  function fermer() { $('result').hidden = true; occupe = false; }
+  $('result').addEventListener('click', fermer);
+
+  let dernier = { code: '', t: 0 };
+  async function verifier(lu) {
+    if (occupe) return;
+    const brut = String(lu).trim();
+    if (!brut) return;
+    if (brut === dernier.code && Date.now() - dernier.t < 4000) return; // même QR encore devant la caméra
+    dernier = { code: brut, t: Date.now() };
+    occupe = true;
+    let d;
+    try {
+      d = await api({ code: brut, poste });
+    } catch (err) {
+      if (err.message === '401') { occupe = false; return; }
+      bip(false);
+      return afficher('bad', `<i data-lucide="wifi-off"></i><h2>Pas de réseau</h2><small>${esc(err.message)}. Réessaie.</small>`);
+    }
+    const b = d.billet;
+    const qui = !b ? '' : b.titulaire
+      ? `<div class="who">${esc(b.titulaire)}${b.nom_duo ? `<br>+ ${esc(b.nom_duo)}` : ''}</div>`
+      : '<div class="who">Ticket papier</div>';
+    if (d.resultat === 'ok') {
+      bip(true);
+      afficher('ok', `<i data-lucide="circle-check"></i><h2>Entrée OK</h2>${qui}<span class="pers">${b.pass === 'duo' ? 'DUO · 2 PERSONNES' : 'SOLO · 1 PERSONNE'}</span><small>${esc(b.numero)}</small>`);
+      compteur();
+    } else if (d.resultat === 'deja_entre') {
+      bip(false);
+      afficher('warn', `<i data-lucide="triangle-alert"></i><h2>Déjà entré</h2>${qui}<small>${esc(b.numero)} · scanné à ${heure(b.entre_le)} (${esc(b.entre_par || '')})</small>`);
+    } else if (d.resultat === 'non_vendu') {
+      bip(false);
+      afficher('bad', `<i data-lucide="ban"></i><h2>Ticket non vendu</h2><small>${esc(b.numero)} · ticket en ligne jamais payé : ne pas laisser entrer, envoyer à l'équipe.</small>`);
+    } else if (d.resultat === 'annule') {
+      bip(false);
+      afficher('bad', `<i data-lucide="ban"></i><h2>Billet annulé</h2>${qui}<small>${esc(b.numero)} · ne pas laisser entrer</small>`);
+    } else {
+      bip(false);
+      afficher('bad', `<i data-lucide="circle-x"></i><h2>Billet inconnu</h2><small>Ce QR n’est pas un billet Babierland City valide.</small>`);
+    }
+  }
+
+  // ---------- Caméra ----------
+  let flux, detecteur, canvas, ctx;
+  async function demarrerCamera() {
+    try {
+      flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } }, audio: false });
+    } catch {
+      $('camMsg').textContent = 'Caméra refusée : utilise la saisie du code ci-dessous.';
+      $('start').hidden = true;
+      return;
+    }
+    const v = $('video');
+    v.srcObject = flux; await v.play();
+    $('start').hidden = true;
+    if ('BarcodeDetector' in window) {
+      try { detecteur = new BarcodeDetector({ formats: ['qr_code'] }); } catch { detecteur = null; }
+    }
+    canvas = document.createElement('canvas'); ctx = canvas.getContext('2d', { willReadFrequently: true });
+    requestAnimationFrame(boucle);
+  }
+
+  let derniereLecture = 0;
+  async function boucle(t) {
+    requestAnimationFrame(boucle);
+    if (occupe || t - derniereLecture < 180) return;
+    derniereLecture = t;
+    const v = $('video');
+    if (v.readyState < 2) return;
+    try {
+      if (detecteur) {
+        const codes = await detecteur.detect(v);
+        if (codes[0]) verifier(codes[0].rawValue);
+      } else if (window.jsQR) {
+        const w = 480, h = Math.round(w * v.videoHeight / v.videoWidth);
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(v, 0, 0, w, h);
+        const img = ctx.getImageData(0, 0, w, h);
+        const code = jsQR(img.data, w, h, { inversionAttempts: 'dontInvert' });
+        if (code) verifier(code.data);
+      }
+    } catch {}
+  }
+
+  // ---------- Connexion ----------
+  function quitter(msg) {
+    cle = ''; store.set('bc-controle', '');
+    if (flux) flux.getTracks().forEach(tr => tr.stop());
+    $('app').hidden = true; $('login').hidden = false;
+    $('poste').value = poste;
+    $('loginErr').textContent = msg || ''; $('loginErr').hidden = !msg;
+  }
+  function entrer() {
+    $('login').hidden = true; $('app').hidden = false;
+    $('posteAff').textContent = poste;
+    compteur(); icons();
+  }
+  $('login').addEventListener('submit', async e => {
+    e.preventDefault();
+    cle = $('cle').value.trim(); poste = $('poste').value.trim() || 'Entrée';
+    try {
+      await api();
+      store.set('bc-controle', cle); store.set('bc-poste', poste);
+      $('cle').value = '';
+      entrer();
+    } catch (err) {
+      if (err.message !== '401') { $('loginErr').textContent = err.message; $('loginErr').hidden = false; }
+    }
+  });
+  $('btnQuit').addEventListener('click', () => quitter());
+  $('btnCam').addEventListener('click', demarrerCamera);
+  $('manual').addEventListener('submit', e => {
+    e.preventDefault();
+    dernier = { code: '', t: 0 };
+    verifier($('saisie').value);
+    $('saisie').value = '';
+  });
+  setInterval(() => { if (cle && !document.hidden) compteur(); }, 20000);
+
+  icons();
+  if (cle) entrer(); else quitter();
+</script>
+</body>
+</html>
