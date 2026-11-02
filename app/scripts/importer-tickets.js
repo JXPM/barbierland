@@ -42,13 +42,21 @@ function decouperQr(png, loc) {
   return PNG.sync.write(out, { colorType: 0 });
 }
 
+// Compteur sur une seule ligne (stderr), pour voir que le script avance.
+const progression = (etape, n, total) => {
+  process.stderr.write(`\r${etape} : ${n}/${total}`);
+  if (n === total) process.stderr.write('\n');
+};
+
 const dossier = mkdtempSync(join(tmpdir(), 'tickets-'));
 try {
+  console.error('Conversion du PDF en images…');
   execFileSync('pdftoppm', ['-r', '150', '-gray', '-png', pdf, join(dossier, 'p')]);
   const pages = readdirSync(dossier).filter(f => f.endsWith('.png')).sort();
   const tickets = [];
   const erreurs = [];
   pages.forEach((f, i) => {
+    progression('Lecture des QR', i + 1, pages.length);
     const numero = execFileSync('pdftotext', ['-f', String(i + 1), '-l', String(i + 1), pdf, '-']).toString().trim();
     if (!/^[SD]\d{3}$/.test(numero)) return erreurs.push(`page ${i + 1} : n° illisible`);
     const png = PNG.sync.read(readFileSync(join(dossier, f)));
@@ -78,7 +86,8 @@ try {
         + `(${conflits.slice(0, 10).map(t => t.numero).join(', ')}…). Rien n'a été importé.`);
     }
     let ajoutes = 0, maj = 0;
-    for (const t of tickets) {
+    for (const [i, t] of tickets.entries()) {
+      progression('Écriture en base', i + 1, tickets.length);
       if (parNumero.has(t.numero)) {
         await client.query('UPDATE billets SET pass = $2, canal = $3, qr_png = $4 WHERE numero = $1',
           [t.numero, t.pass, t.canal, t.qr_png]);
